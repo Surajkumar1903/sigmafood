@@ -56,6 +56,16 @@ const cardVariant: Variants = {
   },
 };
 
+function DiamondIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M6 3h12l4 6-10 12L2 9z"/>
+      <path d="M11 3 8 9l4 12 4-12-3-6"/>
+      <path d="M2 9h20"/>
+    </svg>
+  );
+}
+
 // ────── Hero Section with Layered 3D Food Composition ────────
 function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
   const navigate = useNavigate();
@@ -200,39 +210,47 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
               </motion.button>
             </motion.div>
 
-            {/* 3 Trust Features in a horizontal row matching screenshot */}
+            {/* 3 Premium Feature Highlights matching screenshot */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg"
+              className="flex items-center gap-6 sm:gap-8 pt-6 border-t border-white/8"
             >
-              {[
-                { icon: Leaf, title: 'Fresh Ingredients', sub: 'Always Fresh', color: '#4ade80' },
-                { icon: Shield, title: 'Hygienic Preparation', sub: 'Quality & Serving', color: '#f5a623' },
-                { icon: Star, title: 'Great Taste', sub: 'Every Time', color: '#f5a623' },
-              ].map(({ icon: Icon, title, sub, color }) => (
-                <div
-                  key={title}
-                  className="p-3 sm:p-3.5 rounded-2xl bg-[rgba(255,255,255,0.04)] border border-white/8 hover:border-[rgba(245,166,35,0.3)] transition-all flex flex-col justify-between"
-                >
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center mb-2"
-                    style={{ backgroundColor: `${color}18` }}
-                  >
-                    <Icon size={15} style={{ color }} />
-                  </div>
-                  <div>
-                    <p className="text-white text-xs font-bold leading-tight">{title}</p>
-                    <p className="text-white/40 text-[11px] mt-0.5">{sub}</p>
-                  </div>
+              <div className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
+                  <Leaf size={18} />
                 </div>
-              ))}
+                <div>
+                  <p className="text-white font-extrabold text-xs sm:text-sm leading-tight">100%</p>
+                  <p className="text-white/50 text-[11px] sm:text-xs">Vegetarian</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
+                  <Shield size={18} />
+                </div>
+                <div>
+                  <p className="text-white font-extrabold text-xs sm:text-sm leading-tight">Freshly</p>
+                  <p className="text-white/50 text-[11px] sm:text-xs">Prepared</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
+                  <DiamondIcon size={18} />
+                </div>
+                <div>
+                  <p className="text-white font-extrabold text-xs sm:text-sm leading-tight">Affordable</p>
+                  <p className="text-white/50 text-[11px] sm:text-xs">Prices</p>
+                </div>
+              </div>
             </motion.div>
           </div>
 
-          {/* Right Column: 3D Food Composition Masterpiece */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[380px] sm:min-h-[460px] lg:min-h-[540px]">
+          {/* Right Column: Large 3D Photorealistic Food Composition matching screenshot */}
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[420px] sm:min-h-[500px] lg:min-h-[580px]">
             {/* 3D Composition Frame with Mouse Tilt */}
             <motion.div
               style={{
@@ -242,74 +260,36 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 rotateY,
                 transformStyle: 'preserve-3d',
               }}
-              className="relative w-full max-w-[460px] sm:max-w-[520px] lg:max-w-[560px] aspect-[4/3] rounded-3xl preserve-3d"
+              className="relative w-full max-w-[620px] aspect-[16/10] sm:aspect-[16/9] rounded-3xl preserve-3d"
             >
               {/* Platter drop shadow */}
               <div
-                className="absolute inset-x-8 bottom-0 h-16 bg-black/95 blur-2xl rounded-full"
+                className="absolute inset-x-8 bottom-0 h-20 bg-black/95 blur-3xl rounded-full"
                 style={{ transform: 'translateZ(-40px)' }}
               />
 
-              {/* Main 3D Composition Base Platter (Burger + Fries + Momos + Iced Drink) */}
+              {/* Main 3D Composition Image matching screenshot */}
               <div
-                className="relative w-full h-full rounded-3xl overflow-hidden border border-white/12 shadow-[0_30px_80px_rgba(0,0,0,0.9)] group bg-[#0e0e0e]"
+                className="relative w-full h-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)] group bg-[#0e0e0e]"
                 style={{ transform: 'translateZ(10px)' }}
               >
                 <img
-                  src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=1200&q=80"
-                  alt="Sigma Foods 3D Gourmet Burger, Fries and Momos Spread"
-                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
+                  src="/hero-composition.png"
+                  alt="Sigma Foods 3D Gourmet Burger, Fries and Drink Platter"
+                  className="w-full h-full object-cover object-right group-hover:scale-105 transition-transform duration-700 ease-out"
                 />
 
-                {/* Dark Vignette & Backglow */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/35 pointer-events-none" />
-                <div className="absolute inset-0 bg-radial from-transparent via-transparent to-black/60 pointer-events-none" />
+                {/* Subtle vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
-                {/* Rising steam over burger and momos */}
-                <div className="absolute bottom-28 left-1/3 w-16 h-28 pointer-events-none opacity-40 animate-steam">
+                {/* Rising steam over burger */}
+                <div className="absolute bottom-28 left-1/2 w-16 h-28 pointer-events-none opacity-40 animate-steam">
                   <div className="w-full h-full bg-gradient-to-t from-white/35 to-transparent blur-md rounded-full" />
-                </div>
-
-                {/* Golden Neon Cursive Calligraphy: "Good Food Good Vibes!" matching screenshot */}
-                <motion.div
-                  style={{ transform: 'translateZ(45px)' }}
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute top-4 right-4 sm:top-6 sm:right-6 pointer-events-none select-none z-20 text-right"
-                >
-                  <p
-                    className="text-xl sm:text-2xl font-bold tracking-wide italic text-[#f5a623] drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  >
-                    Good Food
-                  </p>
-                  <p
-                    className="text-lg sm:text-xl font-bold tracking-wide italic text-[#f5a623]/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)] flex items-center justify-end gap-1"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  >
-                    Good Vibes! ✨
-                  </p>
-                </motion.div>
-
-                {/* Food Spread Badges */}
-                <div
-                  className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex flex-wrap gap-2 z-20"
-                  style={{ transform: 'translateZ(30px)' }}
-                >
-                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg">
-                    <span>🍔</span> Gourmet Burger
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg">
-                    <span>🍟</span> Crispy Fries
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg">
-                    <span>🥟</span> Veg Momos
-                  </span>
                 </div>
               </div>
 
-              {/* Layer 2: Floating 3D Ingredients (Tomato, Onion, Cheese, Leaves) */}
-              {/* Floating Tomato Slice (top-left) */}
+              {/* Interactive Floating 3D Ingredients on Mouse Parallax */}
+              {/* Floating Tomato Slice */}
               <motion.div
                 style={{
                   x: ingX,
@@ -318,12 +298,12 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 }}
                 animate={{ y: [0, -10, 0], rotate: [0, 8, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-6 -left-6 sm:-left-8 text-4xl sm:text-5xl filter drop-shadow-[0_15px_20px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
+                className="absolute -top-6 left-12 text-4xl sm:text-5xl filter drop-shadow-[0_15px_20px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
               >
                 🍅
               </motion.div>
 
-              {/* Floating Purple Onion Ring (top-center) */}
+              {/* Floating Purple Onion Ring */}
               <motion.div
                 style={{
                   x: ingX,
@@ -332,26 +312,12 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 }}
                 animate={{ y: [0, 8, 0], rotate: [0, -10, 0] }}
                 transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-                className="absolute -top-8 left-1/3 text-3xl sm:text-4xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
+                className="absolute -top-7 right-1/3 text-3xl sm:text-4xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
               >
                 🧅
               </motion.div>
 
-              {/* Floating Cheese Wedge (top-right) */}
-              <motion.div
-                style={{
-                  x: ingX,
-                  y: ingY,
-                  transform: 'translateZ(60px)',
-                }}
-                animate={{ y: [0, -7, 0], rotate: [0, 6, 0] }}
-                transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-                className="absolute -top-4 right-1/4 text-3xl sm:text-4xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
-              >
-                🧀
-              </motion.div>
-
-              {/* Floating Fresh Basil Leaf (mid-left) */}
+              {/* Floating Fresh Basil Leaf */}
               <motion.div
                 style={{
                   x: fgX,
@@ -360,69 +326,52 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 }}
                 animate={{ y: [0, 10, 0], rotate: [0, -15, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                className="absolute top-1/2 -left-8 text-3xl sm:text-4xl filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
+                className="absolute top-1/2 -left-6 text-3xl sm:text-4xl filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
               >
                 🌿
               </motion.div>
 
-              {/* Floating Chili Slice (bottom-left) */}
+              {/* Golden Neon Cursive Calligraphy: Good Food Good Vibes! */}
               <motion.div
-                style={{
-                  x: fgX,
-                  y: fgY,
-                  transform: 'translateZ(70px)',
-                }}
-                animate={{ y: [0, -8, 0], rotate: [0, 12, 0] }}
-                transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
-                className="absolute -bottom-6 left-1/4 text-2xl sm:text-3xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
-              >
-                🌶️
-              </motion.div>
-
-              {/* Floating 3D Badge 1: 5.0 Star Rating */}
-              <motion.div
-                style={{ transform: 'translateZ(50px)' }}
+                style={{ transform: 'translateZ(45px)' }}
                 animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                whileHover={{ scale: 1.08 }}
-                className="absolute -top-5 -left-4 px-4 py-2 rounded-2xl bg-black/90 backdrop-blur-xl border border-white/15 shadow-[0_15px_30px_rgba(0,0,0,0.8)] flex items-center gap-2.5 z-30 cursor-pointer"
+                transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -top-4 right-8 pointer-events-none select-none z-30 text-right"
               >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#f5a623] to-[#ff6b35] flex items-center justify-center shadow-md">
-                  <Star size={16} fill="#070707" className="text-[#070707]" />
-                </div>
-                <div>
-                  <p className="text-white font-extrabold text-xs leading-tight">5.0 Star Rating</p>
-                  <p className="text-[#f5a623] text-[10px] font-semibold leading-tight">Google Verified</p>
-                </div>
-              </motion.div>
-
-              {/* Floating 3D Badge 2: 100% Vegetarian */}
-              <motion.div
-                style={{ transform: 'translateZ(55px)' }}
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-                whileHover={{ scale: 1.08 }}
-                className="absolute -bottom-5 -right-4 px-4 py-2 rounded-2xl bg-black/90 backdrop-blur-xl border border-white/15 shadow-[0_15px_30px_rgba(0,0,0,0.8)] flex items-center gap-2.5 z-30 cursor-pointer"
-              >
-                <div className="w-8 h-8 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center">
-                  <Leaf size={16} className="text-green-400" />
-                </div>
-                <div>
-                  <p className="text-white font-extrabold text-xs leading-tight">100% Vegetarian</p>
-                  <p className="text-green-400 text-[10px] font-semibold leading-tight">Sector 2 Rohini</p>
-                </div>
+                <p
+                  className="text-lg sm:text-xl font-bold tracking-wide italic text-[#f5a623] drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                >
+                  Good Food
+                </p>
+                <p
+                  className="text-base sm:text-lg font-bold tracking-wide italic text-[#f5a623]/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                >
+                  Good Vibes! ✨
+                </p>
               </motion.div>
             </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Far Right: Animated Scroll Down Indicator matching screenshot */}
-      <div className="hidden xl:flex flex-col items-center absolute right-6 top-1/2 -translate-y-1/2 z-20">
+      {/* Far Right: 3 Indicator Dots + Scroll Down Indicator matching screenshot */}
+      <div className="hidden xl:flex flex-col items-center gap-3 absolute right-6 top-1/2 -translate-y-1/2 z-20">
+        {/* 3 Vertical Carousel Dots matching screenshot */}
+        <div className="w-2.5 h-2.5 rounded-full bg-[#f5a623] shadow-[0_0_12px_#f5a623]" />
+        <div className="w-2.5 h-2.5 rounded-full bg-white/25" />
+        <div className="w-2.5 h-2.5 rounded-full bg-white/25" />
+
+        {/* Small golden food doodle icon */}
+        <div className="my-2 text-xs text-[#f5a623]/80 select-none">
+          ✨
+        </div>
+
         {/* Mouse outline icon */}
         <motion.div
           onClick={scrollToCategories}
-          className="w-5 h-8 rounded-full border-2 border-white/30 flex items-start justify-center p-1 cursor-pointer hover:border-[#f5a623] transition-colors"
+          className="w-5 h-8 rounded-full border-2 border-white/30 flex items-start justify-center p-1 cursor-pointer hover:border-[#f5a623] transition-colors mt-2"
           title="Scroll Down"
         >
           <motion.div
@@ -433,17 +382,17 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
         </motion.div>
         {/* Vertical text */}
         <span
-          className="text-[10px] font-bold text-white/40 tracking-widest uppercase my-3 select-none"
+          className="text-[10px] font-bold text-white/40 tracking-widest uppercase my-2 select-none"
           style={{ writingMode: 'vertical-rl' }}
         >
           Scroll Down
         </span>
         {/* Glowing vertical line with moving golden dot */}
-        <div className="w-[1.5px] h-14 bg-white/10 relative overflow-hidden rounded-full">
+        <div className="w-[1.5px] h-12 bg-white/10 relative overflow-hidden rounded-full">
           <motion.div
-            animate={{ y: [-15, 60] }}
+            animate={{ y: [-15, 50] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-full h-5 bg-gradient-to-b from-transparent via-[#f5a623] to-transparent shadow-[0_0_8px_#f5a623]"
+            className="w-full h-4 bg-gradient-to-b from-transparent via-[#f5a623] to-transparent shadow-[0_0_8px_#f5a623]"
           />
         </div>
       </div>
