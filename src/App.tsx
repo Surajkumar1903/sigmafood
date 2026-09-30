@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import SearchModal from './components/SearchModal';
 import QuickViewModal from './components/QuickViewModal';
+import PromoPopup from './components/PromoPopup';
 import MobileBottomNav from './components/MobileBottomNav';
 import ScrollToTop from './components/ScrollToTop';
 import ScrollProgress from './components/ScrollProgress';
@@ -57,6 +58,7 @@ export default function App() {
         <CartDrawer />
         <SearchModal />
         <QuickViewModal />
+        <PromoPopup />
         <MobileBottomNav />
         <Toaster
           position="top-right"
