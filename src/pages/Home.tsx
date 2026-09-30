@@ -249,7 +249,7 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
             </motion.div>
           </div>
 
-          {/* Right Column: Large 3D Photorealistic Food Composition matching screenshot */}
+          {/* Right Column: Large 3D Photorealistic Food Composition */}
           <div className="lg:col-span-6 relative flex items-center justify-center min-h-[420px] sm:min-h-[500px] lg:min-h-[580px]">
             {/* 3D Composition Frame with Mouse Tilt */}
             <motion.div
@@ -260,30 +260,36 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 rotateY,
                 transformStyle: 'preserve-3d',
               }}
-              className="relative w-full max-w-[620px] aspect-[16/10] sm:aspect-[16/9] rounded-3xl preserve-3d"
+              className="relative w-full max-w-[560px] preserve-3d"
             >
+              {/* Golden Ambient Glow behind platter */}
+              <div
+                className="absolute inset-4 rounded-full blur-[80px] opacity-40 pointer-events-none -z-10"
+                style={{
+                  background: 'radial-gradient(circle, #f5a623 10%, #ff6b35 45%, transparent 70%)',
+                  transform: 'translateZ(-30px)',
+                }}
+              />
+
               {/* Platter drop shadow */}
               <div
-                className="absolute inset-x-8 bottom-0 h-20 bg-black/95 blur-3xl rounded-full"
+                className="absolute inset-x-8 -bottom-4 h-16 bg-black/95 blur-2xl rounded-full pointer-events-none"
                 style={{ transform: 'translateZ(-40px)' }}
               />
 
-              {/* Main 3D Composition Image matching screenshot */}
+              {/* Main 3D Composition Image */}
               <div
-                className="relative w-full h-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.95)] group bg-[#0e0e0e]"
+                className="relative w-full rounded-3xl overflow-hidden group"
                 style={{ transform: 'translateZ(10px)' }}
               >
                 <img
                   src="/hero-composition.png"
-                  alt="Sigma Foods 3D Gourmet Burger, Fries and Drink Platter"
-                  className="w-full h-full object-cover object-right group-hover:scale-105 transition-transform duration-700 ease-out"
+                  alt="Sigma Foods 3D Gourmet Burger, Crispy Fries and Cold Drink Platter"
+                  className="w-full h-auto object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.85)] group-hover:scale-102 transition-transform duration-700 ease-out"
                 />
 
-                {/* Subtle vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-
                 {/* Rising steam over burger */}
-                <div className="absolute bottom-28 left-1/2 w-16 h-28 pointer-events-none opacity-40 animate-steam">
+                <div className="absolute bottom-24 left-1/2 w-16 h-24 pointer-events-none opacity-40 animate-steam">
                   <div className="w-full h-full bg-gradient-to-t from-white/35 to-transparent blur-md rounded-full" />
                 </div>
               </div>
@@ -298,7 +304,7 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 }}
                 animate={{ y: [0, -10, 0], rotate: [0, 8, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-6 left-12 text-4xl sm:text-5xl filter drop-shadow-[0_15px_20px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
+                className="absolute -top-4 left-4 text-4xl sm:text-5xl filter drop-shadow-[0_15px_20px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
               >
                 🍅
               </motion.div>
@@ -312,7 +318,7 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 }}
                 animate={{ y: [0, 8, 0], rotate: [0, -10, 0] }}
                 transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-                className="absolute -top-7 right-1/3 text-3xl sm:text-4xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
+                className="absolute -top-6 right-1/4 text-3xl sm:text-4xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
               >
                 🧅
               </motion.div>
@@ -331,25 +337,31 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 🌿
               </motion.div>
 
-              {/* Golden Neon Cursive Calligraphy: Good Food Good Vibes! */}
+              {/* Floating Glass Badge: 100% Pure Veg Gourmet */}
               <motion.div
                 style={{ transform: 'translateZ(45px)' }}
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-4 right-8 pointer-events-none select-none z-30 text-right"
+                className="absolute -top-4 -right-2 sm:right-4 z-30 pointer-events-none"
               >
-                <p
-                  className="text-lg sm:text-xl font-bold tracking-wide italic text-[#f5a623] drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                >
-                  Good Food
-                </p>
-                <p
-                  className="text-base sm:text-lg font-bold tracking-wide italic text-[#f5a623]/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                >
-                  Good Vibes! ✨
-                </p>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[rgba(15,15,15,0.85)] border border-[rgba(245,166,35,0.4)] backdrop-blur-md shadow-[0_10px_25px_rgba(0,0,0,0.7)]">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[#f5a623] text-xs font-bold tracking-wide">100% Pure Veg Platter</span>
+                </div>
+              </motion.div>
+
+              {/* Floating Glass Badge: 5.0 Rating */}
+              <motion.div
+                style={{ transform: 'translateZ(50px)' }}
+                animate={{ y: [0, 6, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+                className="absolute -bottom-4 right-6 z-30 pointer-events-none"
+              >
+                <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[rgba(15,15,15,0.85)] border border-white/15 backdrop-blur-md shadow-[0_10px_25px_rgba(0,0,0,0.7)]">
+                  <Star size={13} className="text-[#f5a623]" fill="#f5a623" />
+                  <span className="text-white text-xs font-bold">5.0</span>
+                  <span className="text-white/50 text-[11px]">• 13+ Google Reviews</span>
+                </div>
               </motion.div>
             </motion.div>
           </div>
