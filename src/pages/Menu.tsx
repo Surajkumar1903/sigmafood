@@ -123,10 +123,10 @@ export default function MenuPage() {
         )}
 
         {/* Category Tabs */}
-        <div className="flex gap-2 overflow-x-auto scroll-x pb-3 mb-8">
+        <div className="flex gap-2 overflow-x-auto scroll-touch-x pb-3 mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
           <button
             onClick={() => setSelectedCategory('All')}
-            className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex-shrink-0 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               selectedCategory === 'All' ? 'bg-[#f5a623] text-[#070707]' : 'glass text-white/60 hover:text-white border border-white/8'
             }`}
           >
@@ -136,36 +136,37 @@ export default function MenuPage() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 selectedCategory === cat ? 'bg-[#f5a623] text-[#070707]' : 'glass text-white/60 hover:text-white border border-white/8'
               }`}
             >
-              {CATEGORY_EMOJIS[cat]} {cat}
+              <span>{CATEGORY_EMOJIS[cat]}</span>
+              <span>{cat}</span>
             </button>
           ))}
         </div>
 
         {/* Results info */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-white/40 text-sm">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <p className="text-white/40 text-xs sm:text-sm">
             {filtered.length === 0 ? 'No items found' : `Showing ${filtered.length} item${filtered.length !== 1 ? 's' : ''}`}
             {selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}
           </p>
           {(search || selectedCategory !== 'All' || showOnlyBestSeller || showOnlyNew) && (
             <button
               onClick={() => { setSearch(''); setSelectedCategory('All'); setShowOnlyBestSeller(false); setShowOnlyNew(false); }}
-              className="text-[#f5a623] text-sm hover:underline flex items-center gap-1"
+              className="text-[#f5a623] text-xs sm:text-sm hover:underline flex items-center gap-1 cursor-pointer"
             >
               <X size={13} /> Clear Filters
             </button>
           )}
         </div>
 
-        {/* Grid */}
+        {/* Grid: 2 Columns on Mobile */}
         {filtered.length > 0 ? (
           <div className={view === 'grid'
-            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-            : 'flex flex-col gap-4'
+            ? 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6'
+            : 'flex flex-col gap-3 sm:gap-4'
           }>
             {filtered.map(p => <ProductCard key={p.id} product={p} view={view} />)}
           </div>

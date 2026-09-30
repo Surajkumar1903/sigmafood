@@ -34,7 +34,7 @@ export default function App() {
       <ScrollProgress />
       <div className="min-h-screen" style={{ backgroundColor: '#070707', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
         <Navbar />
-        <main className="pb-16 lg:pb-0">
+        <main className="pb-20 lg:pb-0">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/menu" element={<MenuPage />} />

@@ -125,13 +125,13 @@ export default function ProductCard({ product, view = 'grid' }: Props) {
   }
 
   return (
-    <div className="glass rounded-2xl overflow-hidden border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all duration-300 flex flex-col group relative bg-[#0d0d0d] shadow-lg hover:shadow-[0_20px_45px_rgba(0,0,0,0.7)]">
+    <div className="glass rounded-2xl overflow-hidden border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all duration-300 flex flex-col justify-between group relative bg-[#0d0d0d] shadow-lg hover:shadow-[0_20px_45px_rgba(0,0,0,0.7)] h-full">
       {/* Top Image Container */}
-      <Link to={`/product/${product.id}`} className="block relative h-48 sm:h-52 overflow-hidden bg-black/40">
+      <Link to={`/product/${product.id}`} className="block relative h-36 xs:h-44 sm:h-52 overflow-hidden bg-black/40">
         {/* Badge */}
         {product.badge && (
-          <div className="absolute top-3 left-3 z-10">
-            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] shadow-lg ${getBadgeStyle(product.badge)}`}>
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-[11px] shadow-lg ${getBadgeStyle(product.badge)}`}>
               <span>{getBadgeIcon(product.badge)}</span>
               <span>{product.badge}</span>
             </span>
@@ -139,7 +139,7 @@ export default function ProductCard({ product, view = 'grid' }: Props) {
         )}
 
         {/* Top Right Action Buttons: Quick View & Wishlist */}
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 flex items-center gap-1 sm:gap-1.5">
           <motion.button
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
@@ -148,23 +148,23 @@ export default function ProductCard({ product, view = 'grid' }: Props) {
               e.stopPropagation();
               setActiveProductId(product.id);
             }}
-            className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-[#f5a623] hover:border-[#f5a623]/40 transition-all cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-[#f5a623] hover:border-[#f5a623]/40 transition-all cursor-pointer"
             aria-label="Quick View"
             title="Quick View"
           >
-            <Eye size={14} />
+            <Eye size={12} className="sm:w-3.5 sm:h-3.5" />
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleWishlist}
-            className={`w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center transition-all cursor-pointer ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center transition-all cursor-pointer ${
               wishlisted ? 'text-red-400 border-red-400/30' : 'text-white/50 hover:text-red-400'
             }`}
             aria-label="Wishlist"
             title="Wishlist"
           >
-            <Heart size={14} fill={wishlisted ? 'currentColor' : 'none'} />
+            <Heart size={12} className="sm:w-3.5 sm:h-3.5" fill={wishlisted ? 'currentColor' : 'none'} />
           </motion.button>
         </div>
 
@@ -179,45 +179,45 @@ export default function ProductCard({ product, view = 'grid' }: Props) {
       </Link>
 
       {/* Card Content */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
           <Link to={`/product/${product.id}`} className="block">
-            <h3 className="text-white font-bold text-base mb-1 group-hover:text-[#f5a623] transition-colors">
+            <h3 className="text-white font-bold text-xs sm:text-base mb-1 group-hover:text-[#f5a623] transition-colors truncate">
               {product.name}
             </h3>
           </Link>
-          <p className="text-white/50 text-xs leading-relaxed mb-3 line-clamp-2">
+          <p className="text-white/50 text-[10px] sm:text-xs leading-relaxed mb-2 line-clamp-1 sm:line-clamp-2">
             {product.description}
           </p>
-          <div className="flex items-center gap-1.5 mb-4">
-            <Star size={13} className="text-[#f5a623]" fill="#f5a623" />
-            <span className="text-white font-semibold text-xs">{product.rating}</span>
-            <span className="text-white/40 text-xs">({product.reviewCount}+ reviews)</span>
+          <div className="flex items-center gap-1 sm:gap-1.5 mb-2.5 sm:mb-4">
+            <Star size={11} className="text-[#f5a623] sm:w-3 sm:h-3" fill="#f5a623" />
+            <span className="text-white font-semibold text-[10px] sm:text-xs">{product.rating}</span>
+            <span className="text-white/40 text-[9px] sm:text-xs">({product.reviewCount}+)</span>
           </div>
         </div>
 
         {/* Price & Add to Cart button */}
-        <div>
-          <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-white font-extrabold text-xl">₹ {product.price}</span>
+        <div className="mt-auto">
+          <div className="flex items-baseline gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+            <span className="text-white font-extrabold text-sm sm:text-xl">₹ {product.price}</span>
             {product.originalPrice && (
-              <span className="text-white/30 text-xs line-through">₹ {product.originalPrice}</span>
+              <span className="text-white/30 text-[10px] sm:text-xs line-through">₹ {product.originalPrice}</span>
             )}
           </div>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.94 }}
             onClick={handleAdd}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-colors duration-200 btn-shine cursor-pointer ${
+            className={`w-full flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 rounded-xl font-bold text-[11px] sm:text-sm transition-colors duration-200 btn-shine cursor-pointer ${
               added
                 ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(74,222,128,0.3)]'
                 : 'bg-[#f5a623] hover:bg-[#e09618] text-[#070707] shadow-[0_0_20px_rgba(245,166,35,0.25)] hover:shadow-[0_0_25px_rgba(245,166,35,0.45)]'
             }`}
           >
             {added ? (
-              <><Check size={16} /> Added to Cart</>
+              <><Check size={14} className="shrink-0" /> Added</>
             ) : (
-              <><ShoppingCart size={16} /> Add to Cart</>
+              <><ShoppingCart size={14} className="shrink-0" /> Add to Cart</>
             )}
           </motion.button>
         </div>

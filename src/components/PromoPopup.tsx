@@ -179,7 +179,7 @@ export default function PromoPopup() {
             </div>
 
             {/* Bottom Bar: Trust Indicators */}
-            <div className="px-6 py-3 bg-black/40 border-t border-white/5 flex items-center justify-around text-[11px] text-white/40">
+            <div className="px-3 sm:px-6 py-2.5 sm:py-3 bg-black/40 border-t border-white/5 flex items-center justify-around text-[9px] sm:text-[11px] text-white/50">
               <span className="flex items-center gap-1">🌱 100% Pure Veg</span>
               <span>•</span>
               <span className="flex items-center gap-1">🚀 Fast Rohini Delivery</span>

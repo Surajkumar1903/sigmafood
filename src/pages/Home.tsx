@@ -123,7 +123,7 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
       ref={heroRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[96vh] flex items-center overflow-hidden pt-28 pb-12 perspective-1500"
+      className="relative min-h-[85vh] sm:min-h-[92vh] flex items-center overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-12 perspective-1500"
       style={{
         background: 'radial-gradient(ellipse at 65% 35%, rgba(245,166,35,0.09) 0%, #070707 68%)',
       }}
@@ -131,15 +131,15 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
       {/* Background Layer 1: Ambient Restaurant Glow & Lighting */}
       <motion.div
         style={{ x: bgX, y: bgY }}
-        className="absolute top-1/4 right-1/4 w-[650px] h-[650px] rounded-full blur-[140px] opacity-25 pointer-events-none"
+        className="absolute top-1/4 right-1/4 w-[450px] sm:w-[650px] h-[450px] sm:h-[650px] rounded-full blur-[100px] sm:blur-[140px] opacity-25 pointer-events-none"
         style-bg={{
           background: 'radial-gradient(circle, #f5a623 0%, #ff6b35 45%, transparent 70%)',
         }}
       />
-      <div className="absolute top-12 left-10 w-96 h-96 rounded-full blur-[120px] opacity-10 bg-[#f5a623] pointer-events-none" />
+      <div className="absolute top-12 left-10 w-64 sm:w-96 h-64 sm:h-96 rounded-full blur-[90px] sm:blur-[120px] opacity-10 bg-[#f5a623] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">
-        <div className="grid lg:grid-cols-12 gap-8 items-center">
+        <div className="grid lg:grid-cols-12 gap-6 sm:gap-8 items-center">
           {/* Left Column: Text & Trust Badges */}
           <div className="lg:col-span-6 z-20">
             {/* Small Badge matching screenshot: Fresh • Hygienic • Vegetarian */}
@@ -147,10 +147,10 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
               initial={{ opacity: 0, y: -15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[rgba(255,255,255,0.05)] border border-white/10 mb-6 backdrop-blur-md shadow-lg"
+              className="inline-flex items-center gap-2 px-3.5 py-1 sm:px-4 sm:py-1.5 rounded-full bg-[rgba(255,255,255,0.05)] border border-white/10 mb-4 sm:mb-6 backdrop-blur-md shadow-lg"
             >
-              <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                <Leaf size={12} className="text-green-400" />
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                <Leaf size={11} className="text-green-400 sm:w-3 sm:h-3" />
               </div>
               <span className="text-white/90 text-xs sm:text-sm font-medium tracking-wide">
                 Fresh • Hygienic • Vegetarian
@@ -163,7 +163,7 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] mb-6 tracking-tight">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] mb-3 sm:mb-6 tracking-tight">
                 <span className="text-white block">More Than Food.</span>
                 <span className="text-gradient-gold block drop-shadow-[0_0_35px_rgba(245,166,35,0.35)]">
                   It's an Experience.
@@ -176,24 +176,24 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-white/60 text-sm sm:text-base leading-relaxed mb-8 max-w-xl"
+              className="text-white/60 text-xs sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-xl"
             >
               Sigma Foods is a modern food outlet dedicated to serving delicious, hygienic, and freshly prepared vegetarian snacks and fast food at affordable prices.
             </motion.p>
 
-            {/* CTA Buttons matching screenshot */}
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap items-center gap-4 mb-10"
+              className="flex flex-row items-center gap-3 sm:gap-4 mb-6 sm:mb-10"
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   to="/menu"
-                  className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] font-extrabold text-sm sm:text-base shadow-[0_0_30px_rgba(245,166,35,0.4)] hover:shadow-[0_0_40px_rgba(245,166,35,0.6)] btn-shine"
+                  className="flex items-center gap-1.5 sm:gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] font-extrabold text-xs sm:text-base shadow-[0_0_25px_rgba(245,166,35,0.4)] hover:shadow-[0_0_35px_rgba(245,166,35,0.6)] btn-shine shrink-0"
                 >
-                  Explore Menu <ArrowRight size={18} strokeWidth={2.5} />
+                  <span>Explore Menu</span> <ArrowRight size={16} strokeWidth={2.5} className="sm:w-4.5 sm:h-4.5" />
                 </Link>
               </motion.div>
 
@@ -201,56 +201,56 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onWatchVideo}
-                className="flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] border border-[rgba(245,166,35,0.4)] text-white font-semibold text-sm sm:text-base transition-all cursor-pointer shadow-lg"
+                className="flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-3.5 rounded-full bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] border border-[rgba(245,166,35,0.4)] text-white font-semibold text-xs sm:text-base transition-all cursor-pointer shadow-lg shrink-0"
               >
-                <div className="w-6 h-6 rounded-full bg-[#f5a623] flex items-center justify-center text-[#070707]">
-                  <Play size={11} fill="#070707" className="ml-0.5" />
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#f5a623] flex items-center justify-center text-[#070707]">
+                  <Play size={10} fill="#070707" className="ml-0.5 sm:w-3 sm:h-3" />
                 </div>
                 <span>Watch Video</span>
               </motion.button>
             </motion.div>
 
-            {/* 3 Premium Feature Highlights matching screenshot */}
+            {/* 3 Premium Feature Highlights */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex items-center gap-6 sm:gap-8 pt-6 border-t border-white/8"
+              className="grid grid-cols-3 gap-2 sm:gap-6 pt-4 sm:pt-6 border-t border-white/8"
             >
-              <div className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
-                  <Leaf size={18} />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3 group">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
+                  <Leaf size={15} className="sm:w-4.5 sm:h-4.5" />
                 </div>
                 <div>
-                  <p className="text-white font-extrabold text-xs sm:text-sm leading-tight">100%</p>
-                  <p className="text-white/50 text-[11px] sm:text-xs">Vegetarian</p>
+                  <p className="text-white font-extrabold text-[11px] sm:text-sm leading-tight">100%</p>
+                  <p className="text-white/50 text-[9px] sm:text-xs">Vegetarian</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
-                  <Shield size={18} />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3 group">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
+                  <Shield size={15} className="sm:w-4.5 sm:h-4.5" />
                 </div>
                 <div>
-                  <p className="text-white font-extrabold text-xs sm:text-sm leading-tight">Freshly</p>
-                  <p className="text-white/50 text-[11px] sm:text-xs">Prepared</p>
+                  <p className="text-white font-extrabold text-[11px] sm:text-sm leading-tight">Freshly</p>
+                  <p className="text-white/50 text-[9px] sm:text-xs">Prepared</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
-                  <DiamondIcon size={18} />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3 group">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center text-[#f5a623] group-hover:scale-105 transition-transform shrink-0">
+                  <DiamondIcon size={15} className="sm:w-4.5 sm:h-4.5" />
                 </div>
                 <div>
-                  <p className="text-white font-extrabold text-xs sm:text-sm leading-tight">Affordable</p>
-                  <p className="text-white/50 text-[11px] sm:text-xs">Prices</p>
+                  <p className="text-white font-extrabold text-[11px] sm:text-sm leading-tight">Affordable</p>
+                  <p className="text-white/50 text-[9px] sm:text-xs">Prices</p>
                 </div>
               </div>
             </motion.div>
           </div>
 
           {/* Right Column: Large 3D Photorealistic Food Composition */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[420px] sm:min-h-[500px] lg:min-h-[580px]">
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[260px] xs:min-h-[320px] sm:min-h-[460px] lg:min-h-[580px] w-full px-2 sm:px-0">
             {/* 3D Composition Frame with Mouse Tilt */}
             <motion.div
               style={{
@@ -260,11 +260,11 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                 rotateY,
                 transformStyle: 'preserve-3d',
               }}
-              className="relative w-full max-w-[560px] preserve-3d"
+              className="relative w-full max-w-[340px] xs:max-w-[420px] sm:max-w-[560px] preserve-3d"
             >
               {/* Golden Ambient Glow behind platter */}
               <div
-                className="absolute inset-4 rounded-full blur-[80px] opacity-40 pointer-events-none -z-10"
+                className="absolute inset-2 sm:inset-4 rounded-full blur-[60px] sm:blur-[80px] opacity-40 pointer-events-none -z-10"
                 style={{
                   background: 'radial-gradient(circle, #f5a623 10%, #ff6b35 45%, transparent 70%)',
                   transform: 'translateZ(-30px)',
@@ -273,23 +273,23 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
 
               {/* Platter drop shadow */}
               <div
-                className="absolute inset-x-8 -bottom-4 h-16 bg-black/95 blur-2xl rounded-full pointer-events-none"
+                className="absolute inset-x-6 sm:inset-x-8 -bottom-3 sm:-bottom-4 h-12 sm:h-16 bg-black/95 blur-xl sm:blur-2xl rounded-full pointer-events-none"
                 style={{ transform: 'translateZ(-40px)' }}
               />
 
               {/* Main 3D Composition Image */}
               <div
-                className="relative w-full rounded-3xl overflow-hidden group"
+                className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden group"
                 style={{ transform: 'translateZ(10px)' }}
               >
                 <img
                   src="/hero-composition.png"
                   alt="Sigma Foods 3D Gourmet Burger, Crispy Fries and Cold Drink Platter"
-                  className="w-full h-auto object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.85)] group-hover:scale-102 transition-transform duration-700 ease-out"
+                  className="w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)] group-hover:scale-102 transition-transform duration-700 ease-out"
                 />
 
                 {/* Rising steam over burger */}
-                <div className="absolute bottom-24 left-1/2 w-16 h-24 pointer-events-none opacity-40 animate-steam">
+                <div className="absolute bottom-20 sm:bottom-24 left-1/2 w-12 sm:w-16 h-20 sm:h-24 pointer-events-none opacity-40 animate-steam">
                   <div className="w-full h-full bg-gradient-to-t from-white/35 to-transparent blur-md rounded-full" />
                 </div>
               </div>
@@ -302,9 +302,9 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                   y: ingY,
                   transform: 'translateZ(55px)',
                 }}
-                animate={{ y: [0, -10, 0], rotate: [0, 8, 0] }}
+                animate={{ y: [0, -8, 0], rotate: [0, 8, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-4 left-4 text-4xl sm:text-5xl filter drop-shadow-[0_15px_20px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
+                className="absolute -top-3 sm:-top-4 left-1 sm:left-4 text-3xl sm:text-5xl filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
               >
                 🍅
               </motion.div>
@@ -316,9 +316,9 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                   y: ingY,
                   transform: 'translateZ(65px)',
                 }}
-                animate={{ y: [0, 8, 0], rotate: [0, -10, 0] }}
+                animate={{ y: [0, 6, 0], rotate: [0, -10, 0] }}
                 transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-                className="absolute -top-6 right-1/4 text-3xl sm:text-4xl filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
+                className="absolute -top-4 sm:-top-6 right-1/4 text-2xl sm:text-4xl filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.65)] pointer-events-none select-none z-30"
               >
                 🧅
               </motion.div>
@@ -330,9 +330,9 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
                   y: fgY,
                   transform: 'translateZ(75px)',
                 }}
-                animate={{ y: [0, 10, 0], rotate: [0, -15, 0] }}
+                animate={{ y: [0, 8, 0], rotate: [0, -15, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                className="absolute top-1/2 -left-6 text-3xl sm:text-4xl filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
+                className="absolute top-1/2 -left-2 sm:-left-6 text-2xl sm:text-4xl filter drop-shadow-[0_10px_18px_rgba(0,0,0,0.7)] pointer-events-none select-none z-30"
               >
                 🌿
               </motion.div>
@@ -340,27 +340,27 @@ function HeroSection({ onWatchVideo }: { onWatchVideo: () => void }) {
               {/* Floating Glass Badge: 100% Pure Veg Gourmet */}
               <motion.div
                 style={{ transform: 'translateZ(45px)' }}
-                animate={{ y: [0, -6, 0] }}
+                animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-4 -right-2 sm:right-4 z-30 pointer-events-none"
+                className="absolute -top-3 sm:-top-4 right-1 sm:right-4 z-30 pointer-events-none"
               >
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[rgba(15,15,15,0.85)] border border-[rgba(245,166,35,0.4)] backdrop-blur-md shadow-[0_10px_25px_rgba(0,0,0,0.7)]">
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-[#f5a623] text-xs font-bold tracking-wide">100% Pure Veg Platter</span>
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[rgba(15,15,15,0.88)] border border-[rgba(245,166,35,0.4)] backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.7)]">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[#f5a623] text-[10px] sm:text-xs font-bold tracking-wide">100% Pure Veg</span>
                 </div>
               </motion.div>
 
               {/* Floating Glass Badge: 5.0 Rating */}
               <motion.div
                 style={{ transform: 'translateZ(50px)' }}
-                animate={{ y: [0, 6, 0] }}
+                animate={{ y: [0, 5, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-                className="absolute -bottom-4 right-6 z-30 pointer-events-none"
+                className="absolute -bottom-3 sm:-bottom-4 right-2 sm:right-6 z-30 pointer-events-none"
               >
-                <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[rgba(15,15,15,0.85)] border border-white/15 backdrop-blur-md shadow-[0_10px_25px_rgba(0,0,0,0.7)]">
-                  <Star size={13} className="text-[#f5a623]" fill="#f5a623" />
-                  <span className="text-white text-xs font-bold">5.0</span>
-                  <span className="text-white/50 text-[11px]">• 13+ Google Reviews</span>
+                <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[rgba(15,15,15,0.88)] border border-white/15 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.7)]">
+                  <Star size={11} className="text-[#f5a623] sm:w-3 sm:h-3" fill="#f5a623" />
+                  <span className="text-white text-[10px] sm:text-xs font-bold">5.0</span>
+                  <span className="text-white/50 text-[9px] sm:text-[11px]">• 13+ Reviews</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -421,42 +421,42 @@ function PopularCategoriesSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
-      className="py-12 px-4 sm:px-6 relative bg-[#070707]"
+      className="py-8 sm:py-12 px-3 sm:px-6 relative bg-[#070707]"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Floating Glass Rounded Container matching screenshot */}
-        <div className="rounded-3xl p-6 sm:p-8 bg-[rgba(18,18,18,0.7)] backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.75)]">
+        {/* Floating Glass Rounded Container */}
+        <div className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-8 bg-[rgba(18,18,18,0.7)] backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.75)]">
           {/* Header inside container with Cloche cover icon */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4 pb-6 border-b border-white/6">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center shrink-0">
-                <Utensils size={22} className="text-[#f5a623]" />
+          <div className="flex flex-row items-center justify-between mb-4 sm:mb-8 pb-3 sm:pb-6 border-b border-white/6">
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] flex items-center justify-center shrink-0">
+                <Utensils size={18} className="text-[#f5a623] sm:w-5 sm:h-5" />
               </div>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                <h2 className="text-lg sm:text-3xl font-extrabold text-white tracking-tight">
                   Popular <span className="text-[#f5a623]">Categories</span>
                 </h2>
-                <p className="text-white/45 text-xs sm:text-sm mt-0.5">
-                  Explore our wide range of delicious vegetarian snacks and fast food.
+                <p className="text-white/45 text-[11px] sm:text-sm hidden xs:block mt-0.5">
+                  Explore delicious vegetarian fast food & cafe specials.
                 </p>
               </div>
             </div>
             <Link
               to="/menu"
-              className="inline-flex items-center gap-1.5 text-[#f5a623] hover:text-[#ffd080] font-bold text-xs sm:text-sm transition-colors shrink-0 group self-start sm:self-end"
+              className="inline-flex items-center gap-1 sm:gap-1.5 text-[#f5a623] hover:text-[#ffd080] font-bold text-xs sm:text-sm transition-colors shrink-0 group"
             >
-              <span>View All Menu</span>
-              <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform" />
+              <span>View All</span>
+              <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform sm:w-4 sm:h-4" />
             </Link>
           </div>
 
-          {/* 7 Category Cards Row matching screenshot */}
+          {/* 7 Category Cards Row */}
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
-            className="flex overflow-x-auto scroll-touch-x pb-3 -mx-2 px-2 sm:mx-0 sm:px-0 sm:pb-0 sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-3.5 sm:gap-4 snap-x"
+            className="flex overflow-x-auto scroll-touch-x pb-2 -mx-1 px-1 sm:mx-0 sm:px-0 sm:pb-0 sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-4 snap-x"
           >
             {CATEGORIES.map((cat) => (
               <motion.div
@@ -464,12 +464,12 @@ function PopularCategoriesSection() {
                 variants={cardVariant}
                 whileHover={{ y: -6, scale: 1.02 }}
                 transition={{ duration: 0.25 }}
-                className="snap-card shrink-0 w-[145px] xs:w-[160px] sm:w-auto"
+                className="snap-card shrink-0 w-[115px] xs:w-[130px] sm:w-auto"
               >
                 <Link to={`/menu?category=${cat}`} className="block group">
-                  <div className="rounded-2xl p-2.5 bg-[rgba(255,255,255,0.03)] border border-white/8 hover:border-[rgba(245,166,35,0.45)] transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
+                  <div className="rounded-xl sm:rounded-2xl p-2 sm:p-2.5 bg-[rgba(255,255,255,0.03)] border border-white/8 hover:border-[rgba(245,166,35,0.45)] transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)]">
                     {/* Food Photo */}
-                    <div className="aspect-square rounded-xl overflow-hidden bg-black/60 relative mb-2.5">
+                    <div className="aspect-square rounded-lg sm:rounded-xl overflow-hidden bg-black/60 relative mb-2">
                       <img
                         src={CATEGORY_IMAGES[cat]}
                         alt={cat}
@@ -479,22 +479,22 @@ function PopularCategoriesSection() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60" />
                     </div>
 
-                    {/* Bottom Pill: [Icon] Category Name + Item count + Arrow */}
-                    <div className="py-2 px-2.5 rounded-xl bg-white/5 border border-white/5 group-hover:bg-[#f5a623] group-hover:border-[#f5a623] transition-colors flex items-center justify-between">
+                    {/* Bottom Pill */}
+                    <div className="py-1.5 px-2 sm:py-2 sm:px-2.5 rounded-lg sm:rounded-xl bg-white/5 border border-white/5 group-hover:bg-[#f5a623] group-hover:border-[#f5a623] transition-colors flex items-center justify-between">
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs shrink-0">{CATEGORY_EMOJIS[cat]}</span>
-                          <p className="text-white group-hover:text-[#070707] font-bold text-xs truncate transition-colors">
+                        <div className="flex items-center gap-1">
+                          <span className="text-[11px] sm:text-xs shrink-0">{CATEGORY_EMOJIS[cat]}</span>
+                          <p className="text-white group-hover:text-[#070707] font-bold text-[11px] sm:text-xs truncate transition-colors">
                             {cat}
                           </p>
                         </div>
-                        <p className="text-white/40 group-hover:text-[#070707]/75 text-[10px] pl-4 transition-colors">
+                        <p className="text-white/40 group-hover:text-[#070707]/75 text-[9px] sm:text-[10px] pl-3.5 transition-colors">
                           {CATEGORY_COUNTS[cat]} Items
                         </p>
                       </div>
-                      <div className="w-6 h-6 rounded-full bg-white/5 group-hover:bg-[#070707]/15 flex items-center justify-center shrink-0 ml-1">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/5 group-hover:bg-[#070707]/15 flex items-center justify-center shrink-0 ml-1">
                         <ArrowRight
-                          size={11}
+                          size={10}
                           className="text-white/40 group-hover:text-[#070707] group-hover:translate-x-0.5 transition-all"
                         />
                       </div>
@@ -518,41 +518,41 @@ function BestSellersSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
-      className="py-20 relative bg-[#090909] border-t border-white/5"
+      className="py-12 sm:py-20 relative bg-[#090909] border-t border-white/5"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Header matching screenshot */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 sm:mb-10 gap-2">
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1">
               <motion.div
                 animate={{ rotate: [-5, 5, -5] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <Crown size={22} className="text-[#f5a623]" />
+                <Crown size={18} className="text-[#f5a623] sm:w-5 sm:h-5" />
               </motion.div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              <h2 className="text-xl sm:text-4xl font-extrabold text-white tracking-tight">
                 Best Sellers
               </h2>
             </div>
-            <p className="text-white/45 text-sm">Most loved. Most ordered.</p>
+            <p className="text-white/45 text-xs sm:text-sm">Most loved. Most ordered.</p>
           </div>
           <Link
             to="/menu"
-            className="inline-flex items-center gap-1.5 text-[#f5a623] hover:text-[#ffd080] font-semibold text-sm transition-colors shrink-0 group"
+            className="inline-flex items-center gap-1 sm:gap-1.5 text-[#f5a623] hover:text-[#ffd080] font-bold text-xs sm:text-sm transition-colors shrink-0 group"
           >
-            <span>View All Menu</span>
-            <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform" />
+            <span>View All</span>
+            <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform sm:w-4 sm:h-4" />
           </Link>
         </div>
 
-        {/* 4 Cards Grid */}
+        {/* 2-Columns on Phone, 4-Columns on Desktop */}
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
         >
           {BEST_SELLERS.map((product) => (
             <motion.div
@@ -574,40 +574,45 @@ function BestSellersSection() {
 function PromotionalBanner() {
   const navigate = useNavigate();
 
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText('SIGMA20');
+    toast.success('Coupon SIGMA20 copied! 🎁 20% OFF applied');
+  };
+
   return (
     <motion.section
       variants={sectionVariant}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
-      className="py-16 px-4 sm:px-6 bg-[#070707]"
+      className="py-10 sm:py-16 px-3 sm:px-6 bg-[#070707]"
     >
       <div className="max-w-7xl mx-auto">
         <motion.div
           whileHover={{ borderColor: 'rgba(245,166,35,0.35)' }}
-          className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-14 border border-[rgba(245,166,35,0.2)] transition-colors"
+          className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-12 lg:p-14 border border-[rgba(245,166,35,0.2)] transition-colors"
           style={{
             background: 'linear-gradient(135deg, #0e0e0e 0%, #15120a 50%, #0e0e0e 100%)',
           }}
         >
           <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full blur-[100px] bg-[#f5a623]/15 pointer-events-none" />
 
-          <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center">
+          <div className="relative z-10 grid lg:grid-cols-12 gap-6 sm:gap-8 items-center">
             {/* Left Content */}
-            <div className="lg:col-span-5">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-3">
+            <div className="lg:col-span-5 text-center sm:text-left">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-2 sm:mb-3">
                 Hungry? <span className="text-[#f5a623]">We've Got You Covered.</span>
               </h2>
-              <p className="text-white/60 text-base mb-8">
+              <p className="text-white/60 text-xs sm:text-base mb-6 sm:mb-8">
                 Delicious food. Great prices. Zero compromise.
               </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/menu')}
-                className="px-8 py-3.5 rounded-full bg-[#f5a623] hover:bg-[#e09618] text-[#070707] font-extrabold text-sm sm:text-base transition-colors shadow-[0_0_30px_rgba(245,166,35,0.35)] btn-shine inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#f5a623] hover:bg-[#e09618] text-[#070707] font-extrabold text-xs sm:text-base transition-colors shadow-[0_0_30px_rgba(245,166,35,0.35)] btn-shine inline-flex items-center gap-2 cursor-pointer"
               >
-                ORDER NOW <ArrowRight size={17} strokeWidth={2.5} />
+                ORDER NOW <ArrowRight size={15} strokeWidth={2.5} className="sm:w-4 sm:h-4" />
               </motion.button>
             </div>
 
@@ -616,7 +621,7 @@ function PromotionalBanner() {
               <motion.div
                 animate={{ y: [0, -8, 0], scale: [1, 1.02, 1] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative w-64 h-52 sm:w-80 sm:h-64 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group"
+                className="relative w-52 h-36 sm:w-80 sm:h-64 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/10 group"
               >
                 <img
                   src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80"
@@ -627,28 +632,30 @@ function PromotionalBanner() {
               </motion.div>
             </div>
 
-            {/* Right: Red Stamp Special Offer matching screenshot */}
+            {/* Right: Red Stamp Special Offer with Tap to Copy */}
             <div className="lg:col-span-3 flex justify-center lg:justify-end">
               <motion.div
                 animate={{ rotate: [-3, -1, -3], scale: [1, 1.02, 1] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                 whileHover={{ scale: 1.06, rotate: 0 }}
-                className="px-6 py-5 rounded-2xl text-center shadow-2xl border border-red-500/30 cursor-pointer"
+                onClick={handleCopyCode}
+                className="px-5 py-4 sm:px-6 sm:py-5 rounded-2xl text-center shadow-2xl border border-red-500/30 cursor-pointer active:scale-95 transition-transform"
                 style={{
                   background: 'linear-gradient(135deg, #c92a2a 0%, #a61e1e 100%)',
                 }}
+                title="Tap to copy code"
               >
-                <p className="text-white/90 text-sm font-bold tracking-wider uppercase mb-1">
+                <p className="text-white/90 text-xs sm:text-sm font-bold tracking-wider uppercase mb-0.5">
                   Special Offer
                 </p>
-                <p className="text-white/80 text-xs font-semibold tracking-widest uppercase">
+                <p className="text-white/80 text-[10px] sm:text-xs font-semibold tracking-widest uppercase">
                   UP TO
                 </p>
-                <p className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight leading-none my-1">
+                <p className="text-white font-extrabold text-2xl sm:text-4xl tracking-tight leading-none my-1">
                   20% OFF
                 </p>
-                <p className="text-white/80 text-[11px] font-medium mt-1">
-                  Use Code: <span className="font-bold text-white underline">SIGMA20</span>
+                <p className="text-white/90 text-[10px] sm:text-[11px] font-medium mt-1 bg-black/25 px-2.5 py-1 rounded-full border border-white/15">
+                  Tap Code: <span className="font-bold text-white underline">SIGMA20</span> 📋
                 </p>
               </motion.div>
             </div>
@@ -693,19 +700,19 @@ function ChefSpecialCombosSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
-      className="py-20 relative bg-[#080808] border-t border-white/5 content-auto"
+      className="py-12 sm:py-20 relative bg-[#080808] border-t border-white/5 content-auto"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-3">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
               <Flame size={13} className="text-[#f5a623]" />
               <span>Chef's Special Offers</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
               Value <span className="text-[#f5a623]">Combos & Platters</span>
             </h2>
-            <p className="text-white/45 text-sm sm:text-base mt-1">
+            <p className="text-white/45 text-xs sm:text-base mt-1">
               Curated hungry packs designed for maximum flavor and mega savings.
             </p>
           </div>
@@ -714,7 +721,7 @@ function ChefSpecialCombosSection() {
             className="inline-flex items-center gap-1.5 text-[#f5a623] hover:text-[#ffd080] font-bold text-xs sm:text-sm self-start sm:self-end group cursor-pointer"
           >
             <span>Explore All Combos</span>
-            <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+            <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform sm:w-4 sm:h-4" />
           </button>
         </div>
 
@@ -723,14 +730,14 @@ function ChefSpecialCombosSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"
         >
           {COMBOS.map((combo) => (
             <motion.div
               key={combo.id}
               variants={cardVariant}
               whileHover={{ y: -6 }}
-              className="rounded-3xl overflow-hidden glass border border-white/8 hover:border-[rgba(245,166,35,0.35)] transition-all duration-300 flex flex-col justify-between group bg-[#0e0e0e] shadow-xl"
+              className="rounded-2xl sm:rounded-3xl overflow-hidden glass border border-white/8 hover:border-[rgba(245,166,35,0.35)] transition-all duration-300 flex flex-col justify-between group bg-[#0e0e0e] shadow-xl"
             >
               <div>
                 <div className="relative aspect-[16/10] overflow-hidden bg-black/60">
@@ -743,34 +750,34 @@ function ChefSpecialCombosSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-black/40" />
 
                   {/* Saving Badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-full bg-[#f5a623] text-[#070707] font-black text-xs shadow-md">
+                  <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3">
+                    <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#f5a623] text-[#070707] font-black text-[10px] sm:text-xs shadow-md">
                       {combo.badge}
                     </span>
                   </div>
 
                   {/* Rating */}
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-white text-xs font-bold flex items-center gap-1">
-                    <Star size={12} fill="#f5a623" className="text-[#f5a623]" />
+                  <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-white text-[11px] sm:text-xs font-bold flex items-center gap-1">
+                    <Star size={11} fill="#f5a623" className="text-[#f5a623]" />
                     <span>{combo.rating}</span>
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xl">{combo.emoji}</span>
-                    <h3 className="text-white font-extrabold text-lg leading-tight group-hover:text-[#f5a623] transition-colors">
+                <div className="p-4 sm:p-6">
+                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                    <span className="text-lg sm:text-xl">{combo.emoji}</span>
+                    <h3 className="text-white font-extrabold text-base sm:text-lg leading-tight group-hover:text-[#f5a623] transition-colors">
                       {combo.name}
                     </h3>
                   </div>
-                  <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-2">
+                  <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 line-clamp-2">
                     {combo.description}
                   </p>
 
-                  <div className="space-y-1.5 mb-6 pt-3 border-t border-white/5">
+                  <div className="space-y-1 mb-4 sm:mb-6 pt-2.5 sm:pt-3 border-t border-white/5">
                     {combo.items.map((it) => (
-                      <div key={it} className="flex items-center gap-2 text-xs text-white/70">
-                        <Check size={13} className="text-[#f5a623] shrink-0" />
+                      <div key={it} className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-white/70">
+                        <Check size={12} className="text-[#f5a623] shrink-0" />
                         <span>{it}</span>
                       </div>
                     ))}
@@ -778,16 +785,16 @@ function ChefSpecialCombosSection() {
                 </div>
               </div>
 
-              <div className="p-6 pt-0 flex items-center justify-between border-t border-white/5 mt-auto">
+              <div className="p-4 sm:p-6 pt-0 flex items-center justify-between border-t border-white/5 mt-auto">
                 <div>
-                  <span className="text-white/35 line-through text-xs mr-2">₹{combo.originalPrice}</span>
-                  <span className="text-2xl font-black text-[#f5a623]">₹{combo.price}</span>
+                  <span className="text-white/35 line-through text-[11px] sm:text-xs mr-1.5">₹{combo.originalPrice}</span>
+                  <span className="text-xl sm:text-2xl font-black text-[#f5a623]">₹{combo.price}</span>
                 </div>
                 <button
                   onClick={() => handleAddCombo(combo)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] font-bold text-xs sm:text-sm shadow-md hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] hover:scale-105 transition-all cursor-pointer btn-shine"
+                  className="flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] font-bold text-xs sm:text-sm shadow-md hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] hover:scale-105 transition-all cursor-pointer btn-shine"
                 >
-                  <Plus size={16} strokeWidth={2.5} />
+                  <Plus size={15} strokeWidth={2.5} />
                   <span>Add Combo</span>
                 </button>
               </div>
@@ -799,13 +806,13 @@ function ChefSpecialCombosSection() {
   );
 }
 
-// ────── Why Choose Us (4 Cards) ──────────────────────────────
+// ────── Why Choose Us (2x2 Grid on Mobile, 4 Cards on Desktop) ─
 function WhyChooseUsSection() {
   const features = [
-    { icon: Leaf, title: 'Fresh Ingredients', desc: 'Quality ingredients prepared fresh daily, never compromised.' },
-    { icon: Shield, title: 'Hygienic Preparation', desc: 'Clean, hygienic food preparation following the highest standards.' },
-    { icon: Smile, title: 'Great Taste', desc: 'Delicious flavors crafted with passion for every craving.' },
-    { icon: Star, title: 'Affordable Prices', desc: 'Great food without compromising your budget.' },
+    { icon: Leaf, title: 'Fresh Ingredients', desc: 'Prepared fresh daily, never compromised.' },
+    { icon: Shield, title: 'Hygienic Prep', desc: 'Highest safety and cleanliness standards.' },
+    { icon: Smile, title: 'Great Taste', desc: 'Flavors crafted with authentic passion.' },
+    { icon: Star, title: 'Affordable Prices', desc: 'Premium food at budget-friendly rates.' },
   ];
 
   return (
@@ -814,12 +821,12 @@ function WhyChooseUsSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
-      className="py-20 relative bg-[#090909] border-t border-white/5 content-auto"
+      className="py-12 sm:py-20 relative bg-[#090909] border-t border-white/5 content-auto"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <p className="text-[#f5a623] text-xs font-bold uppercase tracking-widest mb-2">Our Promise</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <p className="text-[#f5a623] text-xs font-bold uppercase tracking-widest mb-1.5">Our Promise</p>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             Why Choose <span className="text-[#f5a623]">Sigma Foods?</span>
           </h2>
         </div>
@@ -829,20 +836,20 @@ function WhyChooseUsSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
         >
           {features.map(({ icon: Icon, title, desc }) => (
             <motion.div
               key={title}
               variants={cardVariant}
               whileHover={{ y: -6, borderColor: 'rgba(245,166,35,0.35)' }}
-              className="glass rounded-2xl p-6 border border-white/8 transition-all group bg-[#0c0c0c]"
+              className="glass rounded-xl sm:rounded-2xl p-3.5 sm:p-6 border border-white/8 transition-all group bg-[#0c0c0c]"
             >
-              <div className="w-12 h-12 rounded-2xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center mb-4 group-hover:bg-[#f5a623] transition-colors">
-                <Icon size={22} className="text-[#f5a623] group-hover:text-[#070707] transition-colors" />
+              <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-[#f5a623] transition-colors">
+                <Icon size={18} className="text-[#f5a623] group-hover:text-[#070707] transition-colors sm:w-5 sm:h-5" />
               </div>
-              <h3 className="text-white font-bold text-base mb-2">{title}</h3>
-              <p className="text-white/45 text-xs sm:text-sm leading-relaxed">{desc}</p>
+              <h3 className="text-white font-bold text-xs sm:text-base mb-1">{title}</h3>
+              <p className="text-white/45 text-[10px] sm:text-xs leading-relaxed line-clamp-3 sm:line-clamp-none">{desc}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -851,7 +858,7 @@ function WhyChooseUsSection() {
   );
 }
 
-// ────── Google Reviews Section with Stagger Animation ─────────
+// ────── Google Reviews Section with Mobile Touch Swipe ────────
 function GoogleReviewsSection() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -866,55 +873,51 @@ function GoogleReviewsSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
-      className="py-20 relative bg-[#070707] border-t border-white/5 content-auto"
+      className="py-12 sm:py-20 relative bg-[#070707] border-t border-white/5 content-auto"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-row items-center justify-between mb-8 sm:mb-10 gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center shadow-lg shrink-0 cursor-pointer"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white flex items-center justify-center shadow-lg shrink-0 cursor-pointer"
             >
-              <span className="font-extrabold text-2xl" style={{ color: '#4285F4' }}>G</span>
+              <span className="font-extrabold text-xl sm:text-2xl" style={{ color: '#4285F4' }}>G</span>
             </motion.div>
             <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Google Reviews</h2>
-              <p className="text-white/45 text-sm">Real people. Real experiences.</p>
+              <h2 className="text-lg sm:text-3xl font-extrabold text-white">Google Reviews</h2>
+              <p className="text-white/45 text-xs hidden xs:block">Real people. Real experiences.</p>
             </div>
           </div>
-          <div className="text-left sm:text-right">
-            <div className="flex items-center sm:justify-end gap-2 mb-1">
-              <span className="text-white font-extrabold text-xl">5.0</span>
-              <span className="text-white/40 text-sm">/5</span>
-              <div className="flex gap-0.5 ml-1">
+          <div className="text-right">
+            <div className="flex items-center justify-end gap-1.5 sm:gap-2 mb-0.5">
+              <span className="text-white font-extrabold text-base sm:text-xl">5.0</span>
+              <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={15} className="text-[#f5a623]" fill="#f5a623" />
+                  <Star key={i} size={12} className="text-[#f5a623] sm:w-3.5 sm:h-3.5" fill="#f5a623" />
                 ))}
               </div>
             </div>
-            <div className="flex items-center sm:justify-end gap-3">
-              <p className="text-white/40 text-xs">Based on 13+ Google reviews</p>
-              <a
-                href="https://g.co/kgs/sigma-foods"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#f5a623] hover:underline text-xs font-semibold inline-flex items-center gap-1"
-              >
-                Read all reviews →
-              </a>
-            </div>
+            <a
+              href="https://g.co/kgs/sigma-foods"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#f5a623] hover:underline text-[10px] sm:text-xs font-semibold inline-flex items-center gap-1"
+            >
+              13+ Reviews →
+            </a>
           </div>
         </div>
 
-        {/* 3 Review Cards */}
+        {/* Swipeable on Mobile, 3-Columns on Desktop */}
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="flex overflow-x-auto scroll-touch-x snap-x -mx-3 px-3 pb-3 md:grid md:grid-cols-3 gap-3 sm:gap-6"
         >
           {REVIEWS.map((r) => (
             <motion.div
@@ -922,37 +925,37 @@ function GoogleReviewsSection() {
               variants={cardVariant}
               whileHover={{ y: -6, borderColor: 'rgba(245,166,35,0.3)' }}
               transition={{ duration: 0.25 }}
-              className="glass rounded-2xl p-5 border border-white/6 transition-all flex flex-col justify-between bg-[#0e0e0e]"
+              className="snap-card shrink-0 w-[84vw] max-w-[320px] md:w-auto glass rounded-2xl p-4 sm:p-5 border border-white/6 transition-all flex flex-col justify-between bg-[#0e0e0e]"
             >
               <div>
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
                   <img
                     src={r.avatar}
                     alt={r.name}
-                    className="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-white/10 shrink-0"
                   />
                   <div className="min-w-0">
-                    <p className="text-white font-bold text-sm truncate">{r.name}</p>
-                    <p className="text-white/40 text-[11px] flex items-center gap-1">
+                    <p className="text-white font-bold text-xs sm:text-sm truncate">{r.name}</p>
+                    <p className="text-white/40 text-[10px] sm:text-[11px] flex items-center gap-1">
                       <span className="text-blue-400 font-bold">G</span> Google • {r.date}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex gap-0.5 mb-3">
+                <div className="flex gap-0.5 mb-2.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={13} className="text-[#f5a623]" fill="#f5a623" />
+                    <Star key={i} size={11} className="text-[#f5a623] sm:w-3 sm:h-3" fill="#f5a623" />
                   ))}
                 </div>
 
-                <p className="text-white/70 text-xs sm:text-sm leading-relaxed mb-3">
+                <p className="text-white/70 text-xs sm:text-sm leading-relaxed mb-2.5">
                   {expanded[r.id] ? r.fullText : r.text}
                 </p>
               </div>
 
               <button
                 onClick={() => toggleExpand(r.id)}
-                className="text-[#f5a623] hover:underline text-xs font-semibold text-left self-start mt-2 cursor-pointer"
+                className="text-[#f5a623] hover:underline text-[11px] sm:text-xs font-semibold text-left self-start mt-1 cursor-pointer"
               >
                 {expanded[r.id] ? 'Show less' : 'Read more'}
               </button>
@@ -972,15 +975,15 @@ function AboutAndGlanceSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
-      className="py-20 relative bg-[#090909] border-t border-white/5 content-auto"
+      className="py-12 sm:py-20 relative bg-[#090909] border-t border-white/5 content-auto"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="grid lg:grid-cols-12 gap-5 sm:gap-8 items-stretch">
           {/* Left: Cafe Storefront Photo */}
           <motion.div
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.3 }}
-            className="lg:col-span-4 rounded-3xl overflow-hidden border border-white/8 relative group min-h-[300px]"
+            className="lg:col-span-4 rounded-2xl sm:rounded-3xl overflow-hidden border border-white/8 relative group min-h-[200px] sm:min-h-[300px]"
           >
             <img
               src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1000&q=80"
@@ -988,204 +991,118 @@ function AboutAndGlanceSection() {
               className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700"
             />
             {/* Glowing neon logo overlay */}
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-4 sm:p-6">
               <motion.div
                 animate={{ boxShadow: ['0 0 20px rgba(245,166,35,0.2)', '0 0 35px rgba(245,166,35,0.4)', '0 0 20px rgba(245,166,35,0.2)'] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="px-5 py-3 rounded-2xl bg-black/80 backdrop-blur-md border border-[#f5a623]/40 text-center"
+                className="px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl bg-black/80 backdrop-blur-md border border-[#f5a623]/40 text-center"
               >
-                <p className="text-white font-extrabold text-xl tracking-tight">Sigma <span className="text-[#f5a623]">Foods</span></p>
-                <p className="text-[#f5a623]/80 text-[10px] tracking-widest uppercase">More Than Food, It's an Experience</p>
+                <p className="text-white font-extrabold text-lg sm:text-xl tracking-tight">Sigma <span className="text-[#f5a623]">Foods</span></p>
+                <p className="text-[#f5a623]/80 text-[9px] sm:text-[10px] tracking-widest uppercase">More Than Food, It's an Experience</p>
               </motion.div>
             </div>
           </motion.div>
 
           {/* Middle: About Description */}
-          <div className="lg:col-span-5 glass rounded-3xl p-7 sm:p-8 border border-white/8 flex flex-col justify-between bg-[#0c0c0c]">
+          <div className="lg:col-span-5 glass rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-white/8 flex flex-col justify-between bg-[#0c0c0c]">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-semibold mb-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-semibold mb-3 sm:mb-4">
                 <span>⭐</span> About Us
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+              <h2 className="text-xl sm:text-3xl font-extrabold text-white mb-1.5 sm:mb-2">
                 Sigma <span className="text-[#f5a623]">Foods</span>
               </h2>
-              <p className="text-[#f5a623] text-sm font-semibold mb-4">
+              <p className="text-[#f5a623] text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
                 More Than Food, It's an Experience
               </p>
-              <p className="text-white/60 text-xs sm:text-sm leading-relaxed mb-6">
-                Sigma Foods is a modern food outlet dedicated to serving delicious, hygienic, and freshly prepared vegetarian snacks and fast food at affordable prices. We specialize in a wide range of flavorful dishes, including momos, burgers, pasta, cigar rolls, sandwiches, fries, and refreshing beverages, all made with high-quality ingredients and a passion for great taste.
+              <p className="text-white/60 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
+                Sigma Foods is a modern food outlet dedicated to serving delicious, hygienic, and freshly prepared vegetarian snacks and fast food at affordable prices. We specialize in momos, burgers, pasta, cigar rolls, sandwiches, fries, and refreshing beverages in Rohini Sector 2.
               </p>
             </div>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="self-start">
               <Link
                 to="/about"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#f5a623] hover:bg-[#e09618] text-[#070707] font-bold text-sm transition-colors shadow-md btn-shine"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-[#f5a623] hover:bg-[#e09618] text-[#070707] font-bold text-xs sm:text-sm transition-colors shadow-md btn-shine"
               >
-                Learn More <ArrowRight size={15} strokeWidth={2.5} />
+                Learn More <ArrowRight size={14} strokeWidth={2.5} />
               </Link>
             </motion.div>
           </div>
 
           {/* Right: At A Glance Card with Updated Brand Address */}
-          <div className="lg:col-span-3 glass rounded-3xl p-6 sm:p-7 border border-white/8 flex flex-col justify-between bg-[#0c0c0c]">
+          <div className="lg:col-span-3 glass rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-white/8 flex flex-col justify-between bg-[#0c0c0c]">
             <div>
-              <div className="flex items-center gap-2 mb-6 pb-3 border-b border-white/5">
+              <div className="flex items-center gap-2 mb-4 pb-2.5 border-b border-white/5">
                 <span className="text-[#f5a623]">⭐</span>
-                <h3 className="text-white font-extrabold text-sm sm:text-base">At a glance</h3>
+                <h3 className="text-white font-extrabold text-xs sm:text-base">At a glance</h3>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-2.5 sm:gap-4">
                 {/* What we do */}
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
-                    <span className="text-sm">☕</span>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
+                    <span className="text-xs sm:text-sm">☕</span>
                   </div>
                   <div>
-                    <p className="text-white/40 text-[11px]">What we do</p>
+                    <p className="text-white/40 text-[10px] sm:text-[11px]">What we do</p>
                     <p className="text-white font-semibold text-xs sm:text-sm">Cafe</p>
                   </div>
                 </div>
 
-                {/* Location */}
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
-                    <MapPin size={15} className="text-[#f5a623]" />
+                {/* Rating */}
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
+                    <span className="text-xs sm:text-sm">⭐</span>
                   </div>
                   <div>
-                    <p className="text-white/40 text-[11px]">Location</p>
-                    <p className="text-white/80 font-medium text-xs leading-snug">
+                    <p className="text-white/40 text-[10px] sm:text-[11px]">Rating</p>
+                    <p className="text-white font-semibold text-xs sm:text-sm">5.0 / 5 (13+)</p>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="col-span-2 lg:col-span-1 flex items-start gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
+                    <MapPin size={14} className="text-[#f5a623] sm:w-4 sm:h-4" />
+                  </div>
+                  <div>
+                    <p className="text-white/40 text-[10px] sm:text-[11px]">Location</p>
+                    <p className="text-white/80 font-medium text-[11px] sm:text-xs leading-snug">
                       Shop No. 4, Flat N 289, Pocket-6-2, Sector-2, Rohini, Delhi-110085
                     </p>
                   </div>
                 </div>
 
                 {/* Business Hours */}
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
-                    <Clock size={15} className="text-[#f5a623]" />
+                <div className="col-span-2 lg:col-span-1 flex items-start gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
+                    <Clock size={14} className="text-[#f5a623] sm:w-4 sm:h-4" />
                   </div>
                   <div>
-                    <p className="text-white/40 text-[11px]">Business hours</p>
-                    <p className="text-white/80 font-medium text-xs">Monday-Saturday: 11am-11pm</p>
-                    <p className="text-white/80 font-medium text-xs">Sunday: 9am-11pm</p>
-                    <Link to="/contact" className="text-[#f5a623] hover:underline text-[11px] font-semibold mt-0.5 inline-block">
-                      View all days
-                    </Link>
+                    <p className="text-white/40 text-[10px] sm:text-[11px]">Business hours</p>
+                    <p className="text-white/80 font-medium text-[11px] sm:text-xs">Mon-Sat: 11am-11pm • Sun: 9am-11pm</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Google Rating in glance */}
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-3">
-              <span className="text-2xl font-extrabold text-[#4285F4]">G</span>
+            <div className="mt-4 pt-3 border-t border-white/5 flex items-center gap-2 sm:gap-3">
+              <span className="text-xl sm:text-2xl font-extrabold text-[#4285F4]">G</span>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-white font-bold text-sm">5.0</span>
-                  <span className="text-white/40 text-xs">/5</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-white font-bold text-xs sm:text-sm">5.0 / 5</span>
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={11} className="text-[#f5a623]" fill="#f5a623" />
+                      <Star key={i} size={10} className="text-[#f5a623]" fill="#f5a623" />
                     ))}
                   </div>
                 </div>
-                <p className="text-white/40 text-[10px]">Based on 13+ Google reviews</p>
+                <p className="text-white/40 text-[9px] sm:text-[10px]">13+ Google reviews</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </motion.section>
-  );
-}
-
-// ────── Visit Us or Order Now (Bottom Banner) ─────────────────
-function VisitOrOrderBanner() {
-  return (
-    <motion.section
-      variants={sectionVariant}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      className="py-12 px-4 sm:px-6 bg-[#070707] content-auto"
-    >
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          whileHover={{ borderColor: 'rgba(245,166,35,0.3)' }}
-          className="relative rounded-3xl overflow-hidden p-6 sm:p-10 border border-white/8 flex flex-col lg:flex-row items-center justify-between gap-6 transition-colors"
-          style={{
-            background: 'linear-gradient(135deg, #0f0f0f 0%, #15130b 100%)',
-          }}
-        >
-          {/* Left: Decorative + Text */}
-          <div className="flex items-center gap-6">
-            <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-[rgba(245,166,35,0.08)] border border-[rgba(245,166,35,0.2)] items-center justify-center shrink-0 text-3xl">
-              🌿
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-semibold mb-2">
-                <span>⭐</span> Get in Touch
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-                Visit Us or Order Now
-              </h3>
-              <p className="text-white/45 text-xs sm:text-sm mt-1">
-                We're just around the corner in Rohini, Delhi.
-              </p>
-            </div>
-          </div>
-
-          {/* Center: Phone & Address */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
-            {/* Phone */}
-            <motion.a
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href="tel:+917838853490"
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[rgba(245,166,35,0.3)] transition-all group"
-            >
-              <div className="w-9 h-9 rounded-xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center group-hover:bg-[#f5a623] transition-colors">
-                <Phone size={16} className="text-[#f5a623] group-hover:text-[#070707]" />
-              </div>
-              <div>
-                <p className="text-white font-bold text-xs sm:text-sm">+91 7838853490</p>
-                <p className="text-white/40 text-[11px]">Call us anytime</p>
-              </div>
-            </motion.a>
-
-            {/* Location */}
-            <motion.a
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href="https://maps.google.com/?q=Sector+2+Rohini+Delhi+110085"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[rgba(245,166,35,0.3)] transition-all group"
-            >
-              <div className="w-9 h-9 rounded-xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center group-hover:bg-[#f5a623] transition-colors">
-                <MapPin size={16} className="text-[#f5a623] group-hover:text-[#070707]" />
-              </div>
-              <div>
-                <p className="text-white font-bold text-xs sm:text-sm truncate max-w-[200px]">
-                  Shop No. 4, Flat N 289
-                </p>
-                <p className="text-[#f5a623] text-[11px] font-semibold flex items-center gap-1">
-                  Get Directions →
-                </p>
-              </div>
-            </motion.a>
-
-            {/* CTA Button */}
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                to="/contact"
-                className="block px-6 py-3.5 rounded-2xl bg-[#f5a623] hover:bg-[#e09618] text-[#070707] font-extrabold text-sm transition-colors text-center shadow-lg btn-shine whitespace-nowrap"
-              >
-                Contact Us →
-              </Link>
-            </motion.div>
-          </div>
-        </motion.div>
       </div>
     </motion.section>
   );
@@ -1220,29 +1137,29 @@ function FAQSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
-      className="py-20 relative bg-[#070707] border-t border-white/5 content-auto"
+      className="py-12 sm:py-20 relative bg-[#070707] border-t border-white/5 content-auto"
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-bold uppercase tracking-wider mb-3">
+      <div className="max-w-4xl mx-auto px-3 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
             <HelpCircle size={13} className="text-[#f5a623]" />
             <span>Got Questions?</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             Frequently Asked <span className="text-[#f5a623]">Questions</span>
           </h2>
-          <p className="text-white/45 text-sm sm:text-base mt-2">
+          <p className="text-white/45 text-xs sm:text-base mt-1.5">
             Everything you need to know about our food, delivery, and quality.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
               <div
                 key={faq.q}
-                className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                className={`rounded-xl sm:rounded-2xl border transition-all duration-300 overflow-hidden ${
                   isOpen
                     ? 'bg-[rgba(255,255,255,0.04)] border-[rgba(245,166,35,0.4)] shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
                     : 'bg-[#0c0c0c] border-white/8 hover:border-white/15'
@@ -1250,15 +1167,15 @@ function FAQSection() {
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer"
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3 cursor-pointer"
                 >
-                  <span className="font-bold text-white text-sm sm:text-base">{faq.q}</span>
+                  <span className="font-bold text-white text-xs sm:text-base leading-snug">{faq.q}</span>
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 ${
+                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 ${
                       isOpen ? 'bg-[#f5a623] text-[#070707] rotate-180' : 'bg-white/5 text-white/50'
                     }`}
                   >
-                    <ChevronDown size={16} />
+                    <ChevronDown size={14} className="sm:w-4 sm:h-4" />
                   </div>
                 </button>
                 {isOpen && (
@@ -1266,7 +1183,7 @@ function FAQSection() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="px-5 pb-5 pt-1 text-white/60 text-xs sm:text-sm leading-relaxed border-t border-white/5"
+                    className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 text-white/60 text-xs sm:text-sm leading-relaxed border-t border-white/5"
                   >
                     {faq.a}
                   </motion.div>
@@ -1280,7 +1197,7 @@ function FAQSection() {
   );
 }
 
-// ────── Instagram Community Showcase ──────────────────────────
+// ────── Instagram Community Showcase (3 Columns on Mobile) ───
 function InstagramShowcaseSection() {
   const photos = [
     { url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80', caption: 'Gourmet Cheese Burgers' },
@@ -1297,28 +1214,29 @@ function InstagramShowcaseSection() {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
-      className="py-16 bg-[#090909] border-t border-white/5 content-auto"
+      className="py-10 sm:py-16 bg-[#090909] border-t border-white/5 content-auto"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-bold uppercase tracking-wider mb-3">
-            <InstagramIcon size={14} className="text-[#f5a623]" />
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="text-center mb-6 sm:mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
+            <InstagramIcon size={13} className="text-[#f5a623]" />
             <span>@sigmafoodsofficial</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
             Follow Our <span className="text-[#f5a623]">Foodie Journey</span>
           </h2>
-          <p className="text-white/45 text-xs sm:text-sm mt-1">
+          <p className="text-white/45 text-[11px] sm:text-sm mt-0.5">
             Tag us in your photos to get featured on our feed!
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {/* 3 Columns on Phone, 6 on Desktop */}
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
           {photos.map((p, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -5, scale: 1.03 }}
-              className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer border border-white/8 shadow-lg"
+              className="relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer border border-white/8 shadow-lg"
             >
               <img
                 src={p.url}
@@ -1326,14 +1244,106 @@ function InstagramShowcaseSection() {
                 className="w-full h-full object-cover group-hover:scale-112 transition-transform duration-500"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-3 text-center">
-                <InstagramIcon size={24} className="text-[#f5a623] mb-1.5" />
-                <p className="text-white font-bold text-xs">{p.caption}</p>
-                <p className="text-[#f5a623] text-[10px] mt-0.5 font-semibold">#SigmaFoods</p>
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-2 text-center">
+                <InstagramIcon size={18} className="text-[#f5a623] mb-1 sm:w-6 sm:h-6" />
+                <p className="text-white font-bold text-[10px] sm:text-xs line-clamp-1">{p.caption}</p>
+                <p className="text-[#f5a623] text-[9px] mt-0.5 font-semibold">#SigmaFoods</p>
               </div>
             </motion.div>
           ))}
         </div>
+      </div>
+    </motion.section>
+  );
+}
+
+// ────── Visit Us or Order Now (Bottom Banner) ─────────────────
+function VisitOrOrderBanner() {
+  return (
+    <motion.section
+      variants={sectionVariant}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      className="py-8 sm:py-12 px-3 sm:px-6 bg-[#070707] content-auto"
+    >
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          whileHover={{ borderColor: 'rgba(245,166,35,0.3)' }}
+          className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-5 sm:p-10 border border-white/8 flex flex-col lg:flex-row items-center justify-between gap-6 transition-colors"
+          style={{
+            background: 'linear-gradient(135deg, #0f0f0f 0%, #15130b 100%)',
+          }}
+        >
+          {/* Left: Decorative + Text */}
+          <div className="flex items-center gap-4 sm:gap-6 text-center sm:text-left">
+            <div className="hidden sm:flex w-14 h-14 rounded-2xl bg-[rgba(245,166,35,0.08)] border border-[rgba(245,166,35,0.2)] items-center justify-center shrink-0 text-2xl">
+              🌿
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.1)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-[11px] sm:text-xs font-semibold mb-1.5 sm:mb-2">
+                <span>⭐</span> Get in Touch
+              </div>
+              <h3 className="text-xl sm:text-3xl font-extrabold text-white">
+                Visit Us or Order Now
+              </h3>
+              <p className="text-white/45 text-xs sm:text-sm mt-0.5">
+                We're just around the corner in Sector-2, Rohini, Delhi.
+              </p>
+            </div>
+          </div>
+
+          {/* Center: Phone & Address */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+            {/* Phone */}
+            <motion.a
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              href="tel:+917838853490"
+              className="flex items-center gap-3 p-3 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5 hover:border-[rgba(245,166,35,0.3)] transition-all group"
+            >
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center group-hover:bg-[#f5a623] transition-colors shrink-0">
+                <Phone size={15} className="text-[#f5a623] group-hover:text-[#070707]" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-xs sm:text-sm">+91 7838853490</p>
+                <p className="text-white/40 text-[10px]">Call us anytime</p>
+              </div>
+            </motion.a>
+
+            {/* Location */}
+            <motion.a
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              href="https://maps.google.com/?q=Sector+2+Rohini+Delhi+110085"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-3 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5 hover:border-[rgba(245,166,35,0.3)] transition-all group"
+            >
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center group-hover:bg-[#f5a623] transition-colors shrink-0">
+                <MapPin size={15} className="text-[#f5a623] group-hover:text-[#070707]" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-xs sm:text-sm truncate max-w-[190px]">
+                  Shop No. 4, Rohini Sector-2
+                </p>
+                <p className="text-[#f5a623] text-[10px] font-semibold flex items-center gap-1">
+                  Get Directions →
+                </p>
+              </div>
+            </motion.a>
+
+            {/* CTA Button */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                to="/contact"
+                className="block px-5 py-3 rounded-xl sm:rounded-2xl bg-[#f5a623] hover:bg-[#e09618] text-[#070707] font-extrabold text-xs sm:text-sm transition-colors text-center shadow-lg btn-shine whitespace-nowrap"
+              >
+                Contact Us →
+              </Link>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </motion.section>
   );
@@ -1346,7 +1356,7 @@ function FloatingWhatsAppButton() {
       href="https://wa.me/917838853490?text=Hi%20Sigma%20Foods%2C%20I%20want%20to%20place%20an%20order!"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 lg:bottom-8 right-4 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#25D366] text-white font-bold text-xs shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_35px_rgba(37,211,102,0.6)] hover:scale-105 transition-all group"
+      className="fixed bottom-20 lg:bottom-8 right-3 sm:right-6 z-40 flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-full bg-[#25D366] text-white font-bold text-xs shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_35px_rgba(37,211,102,0.6)] hover:scale-105 transition-all group"
       aria-label="Order on WhatsApp"
     >
       <MessageCircle size={18} fill="white" className="text-white" />
