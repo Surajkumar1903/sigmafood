@@ -6,13 +6,24 @@ import {
 import {
   Star, ArrowRight, MapPin, Phone, Clock, Leaf, Shield,
   Smile, Play, X, Crown, Sparkles, Flame, Eye, Utensils,
-  ChevronDown, Check
+  ChevronDown, Check, Plus, MessageCircle, HelpCircle, Camera
 } from 'lucide-react';
+
+function InstagramIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    </svg>
+  );
+}
 import {
-  BEST_SELLERS, CATEGORIES, CATEGORY_IMAGES, CATEGORY_EMOJIS, CATEGORY_COUNTS, REVIEWS, type Category
+  BEST_SELLERS, CATEGORIES, CATEGORY_IMAGES, CATEGORY_EMOJIS, CATEGORY_COUNTS, REVIEWS, COMBOS, type Category, type ComboItem
 } from '../data/products';
 import ProductCard from '../components/ProductCard';
-import { useUIStore } from '../store';
+import { useUIStore, useCartStore } from '../store';
+import toast from 'react-hot-toast';
 
 // ────── Framer Motion Variants ──────────────────────────────
 const sectionVariant: Variants = {
@@ -687,6 +698,146 @@ function PromotionalBanner() {
   );
 }
 
+// ────── Chef's Special Combos Section ────────────────────────
+function ChefSpecialCombosSection() {
+  const addItem = useCartStore(s => s.addItem);
+  const navigate = useNavigate();
+
+  const handleAddCombo = (combo: ComboItem) => {
+    addItem({
+      id: combo.id,
+      name: combo.name,
+      description: combo.description,
+      longDescription: combo.description,
+      category: 'Burgers',
+      price: combo.price,
+      originalPrice: combo.originalPrice,
+      rating: combo.rating,
+      reviewCount: combo.reviewCount,
+      image: combo.image,
+      emoji: combo.emoji.slice(0, 2),
+      badge: combo.badge,
+      isBestSeller: true,
+      isVeg: true,
+      spiceLevel: 1,
+      ingredients: combo.items,
+      isAvailable: true,
+    });
+    toast.success(`${combo.name} added to cart! 🛒`);
+  };
+
+  return (
+    <motion.section
+      variants={sectionVariant}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      className="py-20 relative bg-[#080808] border-t border-white/5 content-auto"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-bold uppercase tracking-wider mb-3">
+              <Flame size={13} className="text-[#f5a623]" />
+              <span>Chef's Special Offers</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Value <span className="text-[#f5a623]">Combos & Platters</span>
+            </h2>
+            <p className="text-white/45 text-sm sm:text-base mt-1">
+              Curated hungry packs designed for maximum flavor and mega savings.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/menu')}
+            className="inline-flex items-center gap-1.5 text-[#f5a623] hover:text-[#ffd080] font-bold text-xs sm:text-sm self-start sm:self-end group cursor-pointer"
+          >
+            <span>Explore All Combos</span>
+            <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          {COMBOS.map((combo) => (
+            <motion.div
+              key={combo.id}
+              variants={cardVariant}
+              whileHover={{ y: -6 }}
+              className="rounded-3xl overflow-hidden glass border border-white/8 hover:border-[rgba(245,166,35,0.35)] transition-all duration-300 flex flex-col justify-between group bg-[#0e0e0e] shadow-xl"
+            >
+              <div>
+                <div className="relative aspect-[16/10] overflow-hidden bg-black/60">
+                  <img
+                    src={combo.image}
+                    alt={combo.name}
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-black/40" />
+
+                  {/* Saving Badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-full bg-[#f5a623] text-[#070707] font-black text-xs shadow-md">
+                      {combo.badge}
+                    </span>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-white text-xs font-bold flex items-center gap-1">
+                    <Star size={12} fill="#f5a623" className="text-[#f5a623]" />
+                    <span>{combo.rating}</span>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">{combo.emoji}</span>
+                    <h3 className="text-white font-extrabold text-lg leading-tight group-hover:text-[#f5a623] transition-colors">
+                      {combo.name}
+                    </h3>
+                  </div>
+                  <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-2">
+                    {combo.description}
+                  </p>
+
+                  <div className="space-y-1.5 mb-6 pt-3 border-t border-white/5">
+                    {combo.items.map((it) => (
+                      <div key={it} className="flex items-center gap-2 text-xs text-white/70">
+                        <Check size={13} className="text-[#f5a623] shrink-0" />
+                        <span>{it}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 pt-0 flex items-center justify-between border-t border-white/5 mt-auto">
+                <div>
+                  <span className="text-white/35 line-through text-xs mr-2">₹{combo.originalPrice}</span>
+                  <span className="text-2xl font-black text-[#f5a623]">₹{combo.price}</span>
+                </div>
+                <button
+                  onClick={() => handleAddCombo(combo)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] font-bold text-xs sm:text-sm shadow-md hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] hover:scale-105 transition-all cursor-pointer btn-shine"
+                >
+                  <Plus size={16} strokeWidth={2.5} />
+                  <span>Add Combo</span>
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </motion.section>
+  );
+}
+
 // ────── Why Choose Us (4 Cards) ──────────────────────────────
 function WhyChooseUsSection() {
   const features = [
@@ -1079,6 +1230,170 @@ function VisitOrOrderBanner() {
   );
 }
 
+// ────── Frequently Asked Questions Section ───────────────────
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const faqs = [
+    {
+      q: "Is all food served at Sigma Foods 100% Pure Vegetarian?",
+      a: "Yes, absolutely! Sigma Foods is a strictly 100% vegetarian cafe. All dishes, sauces, dips, and gravies are prepared with fresh vegetarian ingredients under strict hygiene standards in Rohini Sector 2."
+    },
+    {
+      q: "What is your delivery coverage & average delivery time?",
+      a: "We deliver across Sector 1, Sector 2, Sector 3, Sector 4, Sector 5, Sector 6, Sector 7, Sector 8, and surrounding neighborhoods of Rohini, Delhi. Orders are typically delivered hot & fresh within 25 to 35 minutes."
+    },
+    {
+      q: "What payment methods are supported for home delivery?",
+      a: "We support Cash on Delivery (COD), instant UPI via QR code (Google Pay, PhonePe, Paytm), and major Credit/Debit Cards. You can select your preferred payment mode during checkout."
+    },
+    {
+      q: "Do you take party packs or bulk snacks orders for birthdays?",
+      a: "Yes! We specialize in delicious party platters, bulk burger & momos packs, and beverage combos for office events, get-togethers, and birthday parties. Call us directly at +91 7838853490 for custom discounts."
+    },
+  ];
+
+  return (
+    <motion.section
+      variants={sectionVariant}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+      className="py-20 relative bg-[#070707] border-t border-white/5 content-auto"
+    >
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-bold uppercase tracking-wider mb-3">
+            <HelpCircle size={13} className="text-[#f5a623]" />
+            <span>Got Questions?</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Frequently Asked <span className="text-[#f5a623]">Questions</span>
+          </h2>
+          <p className="text-white/45 text-sm sm:text-base mt-2">
+            Everything you need to know about our food, delivery, and quality.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => {
+            const isOpen = openIndex === idx;
+            return (
+              <div
+                key={faq.q}
+                className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                  isOpen
+                    ? 'bg-[rgba(255,255,255,0.04)] border-[rgba(245,166,35,0.4)] shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                    : 'bg-[#0c0c0c] border-white/8 hover:border-white/15'
+                }`}
+              >
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer"
+                >
+                  <span className="font-bold text-white text-sm sm:text-base">{faq.q}</span>
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 ${
+                      isOpen ? 'bg-[#f5a623] text-[#070707] rotate-180' : 'bg-white/5 text-white/50'
+                    }`}
+                  >
+                    <ChevronDown size={16} />
+                  </div>
+                </button>
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="px-5 pb-5 pt-1 text-white/60 text-xs sm:text-sm leading-relaxed border-t border-white/5"
+                  >
+                    {faq.a}
+                  </motion.div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+// ────── Instagram Community Showcase ──────────────────────────
+function InstagramShowcaseSection() {
+  const photos = [
+    { url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80', caption: 'Gourmet Cheese Burgers' },
+    { url: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80', caption: 'Hot Steamed Veg Momos' },
+    { url: 'https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=600&q=80', caption: 'Creamy Alfredo Pasta' },
+    { url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80', caption: 'Peri Peri Crisp Fries' },
+    { url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80', caption: 'Crispy Veg Cigar Rolls' },
+    { url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80', caption: 'Refreshing Chilled Beverages' },
+  ];
+
+  return (
+    <motion.section
+      variants={sectionVariant}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      className="py-16 bg-[#090909] border-t border-white/5 content-auto"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-bold uppercase tracking-wider mb-3">
+            <InstagramIcon size={14} className="text-[#f5a623]" />
+            <span>@sigmafoodsofficial</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Follow Our <span className="text-[#f5a623]">Foodie Journey</span>
+          </h2>
+          <p className="text-white/45 text-xs sm:text-sm mt-1">
+            Tag us in your photos to get featured on our feed!
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {photos.map((p, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ y: -5, scale: 1.03 }}
+              className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer border border-white/8 shadow-lg"
+            >
+              <img
+                src={p.url}
+                alt={p.caption}
+                className="w-full h-full object-cover group-hover:scale-112 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-3 text-center">
+                <InstagramIcon size={24} className="text-[#f5a623] mb-1.5" />
+                <p className="text-white font-bold text-xs">{p.caption}</p>
+                <p className="text-[#f5a623] text-[10px] mt-0.5 font-semibold">#SigmaFoods</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+// ────── Floating WhatsApp Quick Order Button ─────────────────
+function FloatingWhatsAppButton() {
+  return (
+    <a
+      href="https://wa.me/917838853490?text=Hi%20Sigma%20Foods%2C%20I%20want%20to%20place%20an%20order!"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-20 lg:bottom-8 right-4 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#25D366] text-white font-bold text-xs shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_35px_rgba(37,211,102,0.6)] hover:scale-105 transition-all group"
+      aria-label="Order on WhatsApp"
+    >
+      <MessageCircle size={18} fill="white" className="text-white" />
+      <span className="hidden sm:inline font-bold">Quick WhatsApp Order</span>
+    </a>
+  );
+}
+
 // ────── Main Home Page ────────────────────────────────────────
 export default function HomePage() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
@@ -1094,20 +1409,32 @@ export default function HomePage() {
       {/* 3. Best Sellers with Quick View & Add to Cart */}
       <BestSellersSection />
 
-      {/* 4. Promotional Banner with 20% OFF Red Stamp */}
+      {/* 4. Value Combos & Platters */}
+      <ChefSpecialCombosSection />
+
+      {/* 5. Promotional Banner with 20% OFF Red Stamp */}
       <PromotionalBanner />
 
-      {/* 5. Why Choose Us (4 Cards) */}
+      {/* 6. Why Choose Us (4 Cards) */}
       <WhyChooseUsSection />
 
-      {/* 6. Google Reviews with Stagger Animation */}
+      {/* 7. Google Reviews with Stagger Animation */}
       <GoogleReviewsSection />
 
-      {/* 7. About Us & At A Glance with exact Address */}
+      {/* 8. About Us & At A Glance with exact Address */}
       <AboutAndGlanceSection />
 
-      {/* 8. Bottom Visit/Order Banner */}
+      {/* 9. Frequently Asked Questions (FAQ) */}
+      <FAQSection />
+
+      {/* 10. Instagram Community Foodie Showcase */}
+      <InstagramShowcaseSection />
+
+      {/* 11. Bottom Visit/Order Banner */}
       <VisitOrOrderBanner />
+
+      {/* 12. Floating WhatsApp Quick Order Button */}
+      <FloatingWhatsAppButton />
 
       {/* Video Experience Modal */}
       {videoModalOpen && (

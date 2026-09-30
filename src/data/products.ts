@@ -756,3 +756,63 @@ export const REVIEWS = [
     verified: true,
   },
 ];
+
+export interface ComboItem {
+  id: string;
+  name: string;
+  items: string[];
+  description: string;
+  price: number;
+  originalPrice: number;
+  savings: number;
+  image: string;
+  emoji: string;
+  badge: string;
+  rating: number;
+  reviewCount: number;
+}
+
+export const COMBOS: ComboItem[] = [
+  {
+    id: 'combo-1',
+    name: 'Sigma Ultimate Feast Combo',
+    items: ['1x Cheesy Veg Burger', '1x Peri Peri Fries', '1x Chilled Cold Drink'],
+    description: 'Our most ordered hunger buster combo! Complete with a crisp cheese burger, loaded seasoned peri peri fries and ice cold beverage.',
+    price: 249,
+    originalPrice: 320,
+    savings: 71,
+    image: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=800&q=80',
+    emoji: '🍔🍟🥤',
+    badge: 'Save ₹71 • Best Value',
+    rating: 5.0,
+    reviewCount: 88,
+  },
+  {
+    id: 'combo-2',
+    name: 'Momo & Mojito Platter',
+    items: ['1x Steamed Veg Momos (8 pcs)', '1x Crisp Cigar Rolls (4 pcs)', '1x Fresh Virgin Mint Mojito'],
+    description: 'Perfect street food party package with hot freshly steamed momos, crunchy stuffed cigar rolls and zesty mint mojito.',
+    price: 279,
+    originalPrice: 350,
+    savings: 71,
+    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80',
+    emoji: '🥟🌯🍹',
+    badge: 'Popular • Save ₹71',
+    rating: 4.9,
+    reviewCount: 64,
+  },
+  {
+    id: 'combo-3',
+    name: 'Italian Gourmet Pasta Combo',
+    items: ['1x Creamy White Sauce Pasta', '1x Cheesy Garlic Toast', '1x Thick Cold Coffee with Ice Cream'],
+    description: 'Rich, velvet Alfredo cheese pasta tossed with broccoli and herbs, served with garlic toast and decadent cafe cold coffee.',
+    price: 299,
+    originalPrice: 380,
+    savings: 81,
+    image: 'https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=800&q=80',
+    emoji: '🍝🧄☕',
+    badge: 'Chef Choice • Save ₹81',
+    rating: 5.0,
+    reviewCount: 52,
+  },
+];

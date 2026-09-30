@@ -42,8 +42,8 @@ export default function ContactPage() {
                   <div>
                     <p className="text-white font-semibold mb-1">Address</p>
                     <p className="text-white/50 text-sm leading-relaxed">
-                      Shop No. 4, Pocket 6-II, Sector 2,<br />
-                      Rohini, Delhi, Delhi, 110085
+                      Shop No. 4, Flat N 289, Pocket-6-2, Sector-2,<br />
+                      Rohini, Delhi-110085
                     </p>
                     <a
                       href="https://maps.app.goo.gl/sigma-foods-rohini"
@@ -62,6 +62,15 @@ export default function ContactPage() {
                   <div>
                     <p className="text-white font-semibold mb-1">Phone</p>
                     <a href="tel:+917838853490" className="text-[#f5a623] hover:underline">+91 7838853490</a>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-[rgba(245,166,35,0.1)] flex items-center justify-center shrink-0">
+                    <Mail size={20} className="text-[#f5a623]" />
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold mb-1">Email</p>
+                    <a href="mailto:foodssigma@gmail.co" className="text-[#f5a623] hover:underline">foodssigma@gmail.co</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
