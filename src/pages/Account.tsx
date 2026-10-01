@@ -66,14 +66,25 @@ export default function AccountPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#f5a623] to-[#ff6b35] flex items-center justify-center text-white font-bold text-2xl">
-            {user.name.charAt(0).toUpperCase()}
-          </div>
+          {user.avatar ? (
+            <img src={user.avatar} alt={user.name} className="w-16 h-16 rounded-2xl object-cover shadow-lg border border-white/10" />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#f5a623] to-[#ff6b35] flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div>
-            <h1 className="text-2xl font-extrabold text-white">{user.name}</h1>
-            <p className="text-white/40 text-sm">{user.email}</p>
+            <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+              {user.name}
+              {user.email.includes('gmail') && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold">
+                  Google Verified
+                </span>
+              )}
+            </h1>
+            <p className="text-white/40 text-sm">{user.email} {user.phone ? `• ${user.phone}` : ''}</p>
           </div>
-          <button onClick={handleLogout} className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl glass border border-white/8 text-white/50 hover:text-red-400 hover:border-red-400/20 text-sm transition-all">
+          <button onClick={handleLogout} className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl glass border border-white/8 text-white/50 hover:text-red-400 hover:border-red-400/20 text-sm transition-all cursor-pointer">
             <LogOut size={15} /> Logout
           </button>
         </div>

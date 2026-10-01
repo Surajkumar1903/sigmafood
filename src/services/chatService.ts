@@ -1,5 +1,6 @@
 import { PRODUCTS, BEST_SELLERS, CATEGORIES, type Product, type Category } from '../data/products';
 import { useCartStore, useOrdersStore, type CartItem, type Order } from '../store';
+import { db, type DbChatMessage } from './db';
 
 // ============================================================
 // TYPES & ACTION DEFINITIONS
@@ -56,6 +57,7 @@ export interface ChatResponse {
   recommendedProducts?: Product[];
   suggestedQuickReplies?: string[];
   sessionMemory: SessionMemory;
+  modelUsed?: string;
 }
 
 // Restaurant constants
@@ -205,6 +207,122 @@ function parseQuantityAndName(raw: string): { quantity: number; name: string } {
 }
 
 // ============================================================
+// CHATGPT / OPENAI API CALLER
+// ============================================================
+
+async function callChatGPT(
+  userMessage: string,
+  apiKey: string,
+  model: string,
+  currentCart: CartItem[],
+  sessionMemory: SessionMemory
+): Promise<ChatResponse | null> {
+  const cartSummary = currentCart.map((i) => `${i.quantity}x ${i.product.name} (id: ${i.product.id}, ₹${i.product.price})`).join(', ') || 'Cart is currently empty';
+  const productsSummary = PRODUCTS.map((p) => `${p.name} [id: ${p.id}, cat: ${p.category}, ₹${p.price}, spice: ${p.spiceLevel}, rating: ${p.rating}]`).join('\n');
+
+  const systemPrompt = `You are "Sigma AI", the official food ordering assistant for "Sigma Foods", a 100% pure vegetarian restaurant in Rohini, Delhi.
+
+RESTAURANT INFO:
+- Name: Sigma Foods
+- Type: 100% Pure Vegetarian Cafe & Fast Food
+- Location: Shop No. 4, Flat N 289, Pocket-6-2, Sector-2, Rohini, Delhi-110085
+- Phone: +91 7838853490
+- Hours: Mon-Sat 11 AM - 11 PM, Sunday 9 AM - 11 PM
+- Rating: 5.0 / 5 (13+ Google reviews)
+- Delivery: Free on orders above ₹299 (₹30 for orders under ₹299)
+- Active Coupons: SIGMA10 (10% off), SIGMA20 (20% off orders above ₹499)
+
+CURRENT CART STATE:
+${cartSummary}
+
+SESSION MEMORY:
+- Budget: ${sessionMemory.budget ? `₹${sessionMemory.budget}` : 'None specified'}
+- Preferred Category: ${sessionMemory.preferredCategory || 'None'}
+- Spice: ${sessionMemory.spicePreference || 'Any'}
+
+AVAILABLE PRODUCTS:
+${productsSummary}
+
+BEHAVIOR INSTRUCTIONS:
+1. Always be polite, friendly, appetizing, and concise.
+2. If the user wants to add items to cart, you MUST output structured actions in your JSON response.
+3. You MUST respond with a valid JSON object matching this schema:
+{
+  "message": "User friendly message in markdown with emojis",
+  "actions": [
+    { "type": "ADD_TO_CART", "productId": "momo-1", "quantity": 2 }
+  ],
+  "recommendedProductIds": ["momo-1", "burger-1"],
+  "suggestedQuickReplies": ["🍔 Menu", "🛒 Cart", "💳 Checkout"]
+}
+Allowed action types: ADD_TO_CART, REMOVE_FROM_CART, UPDATE_CART, GET_CART, GET_ORDER_STATUS, GET_RESTAURANT_INFO, OPEN_CHECKOUT, CONTACT_SUPPORT.
+Never invent imaginary food items or wrong prices. Only use the listed products.`;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: model || 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+        temperature: 0.7,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!res.ok) {
+      console.warn('OpenAI API returned status:', res.status);
+      return null;
+    }
+
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) return null;
+
+    const parsed = JSON.parse(content);
+    const actions: ChatAction[] = [];
+
+    if (Array.isArray(parsed.actions)) {
+      for (const act of parsed.actions) {
+        const prod = PRODUCTS.find((p) => p.id === act.productId);
+        actions.push({
+          type: act.type,
+          productId: act.productId,
+          product: prod,
+          quantity: act.quantity || 1,
+        });
+      }
+    }
+
+    const recommendedProducts: Product[] = [];
+    if (Array.isArray(parsed.recommendedProductIds)) {
+      for (const pid of parsed.recommendedProductIds) {
+        const p = PRODUCTS.find((prod) => prod.id === pid);
+        if (p) recommendedProducts.push(p);
+      }
+    }
+
+    return {
+      message: parsed.message || 'Here is what I found for you!',
+      actions,
+      recommendedProducts: recommendedProducts.length > 0 ? recommendedProducts : undefined,
+      suggestedQuickReplies: parsed.suggestedQuickReplies || ['🍔 Menu', '🔥 Best Sellers', '🛒 Cart', '📦 Track Order'],
+      sessionMemory,
+      modelUsed: `ChatGPT (${model || 'gpt-4o-mini'})`,
+    };
+  } catch (err) {
+    console.warn('Failed to call ChatGPT:', err);
+    return null;
+  }
+}
+
+// ============================================================
 // LOCAL INTELLIGENT AI ENGINE (Client NLP & Contextual Reasoning)
 // ============================================================
 
@@ -265,7 +383,7 @@ export async function processLocalChatMessage(
       memory.lastMentionedProductId = product.id;
       reply = `Done! I've added **${product.name}** (₹${product.price}) to your cart 🛒\n\nWould you like anything else or ready for checkout?`;
       quickReplies = ['🛒 View Cart', '💳 Checkout', '🍔 Browse Menu', '🔥 Best Sellers'];
-      return { message: reply, actions, recommendedProducts: [product], suggestedQuickReplies: quickReplies, sessionMemory: memory };
+      return { message: reply, actions, recommendedProducts: [product], suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
     }
   }
 
@@ -273,7 +391,6 @@ export async function processLocalChatMessage(
   // CASE B: Add to cart intent: "Add 2 veg momos", "Add one burger", "Add 2 veg momos and 1 burger"
   // ------------------------------------------------------------
   if (lower.startsWith('add ') || lower.startsWith('order ') || lower.includes('add to cart') || lower.includes('put in cart')) {
-    // Check if compound statement with "and"
     const cleaned = lower.replace(/add to cart/gi, 'add').replace(/put in cart/gi, 'add');
     const itemsPart = cleaned.replace(/^(?:please )?(?:add|order)\s+/i, '');
     const parts = itemsPart.split(/\s+and\s+|\s*,\s*/);
@@ -305,6 +422,7 @@ export async function processLocalChatMessage(
         recommendedProducts: addedList.map((i) => i.product),
         suggestedQuickReplies: quickReplies,
         sessionMemory: memory,
+        modelUsed: 'Sigma AI Engine',
       };
     }
   }
@@ -324,7 +442,7 @@ export async function processLocalChatMessage(
       actions.push({ type: 'UPDATE_CART', productId: product.id, product, quantity: qty });
       reply = `Updated! Your cart now has **${qty} × ${product.name}**.`;
       quickReplies = ['🛒 View Cart', '💳 Checkout', '🍔 Browse Menu'];
-      return { message: reply, actions, sessionMemory: memory, suggestedQuickReplies: quickReplies };
+      return { message: reply, actions, sessionMemory: memory, suggestedQuickReplies: quickReplies, modelUsed: 'Sigma AI Engine' };
     }
   }
 
@@ -340,7 +458,7 @@ export async function processLocalChatMessage(
       actions.push({ type: 'REMOVE_FROM_CART', productId: product.id, product });
       reply = `I have removed **${product.name}** from your cart.`;
       quickReplies = ['🛒 View Cart', '🍔 Explore Menu', '🔥 Best Sellers'];
-      return { message: reply, actions, sessionMemory: memory, suggestedQuickReplies: quickReplies };
+      return { message: reply, actions, sessionMemory: memory, suggestedQuickReplies: quickReplies, modelUsed: 'Sigma AI Engine' };
     }
   }
 
@@ -364,7 +482,7 @@ export async function processLocalChatMessage(
       quickReplies = ['💳 Proceed to Checkout', '🍔 Add More Food', '🗑️ Clear Cart'];
       actions.push({ type: 'OPEN_CART' });
     }
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -382,7 +500,7 @@ export async function processLocalChatMessage(
       reply = `Your cart total is **₹${total}** (${currentCart.reduce((acc, i) => acc + i.quantity, 0)} items).\n\nReady to complete your delicious vegetarian meal? Click the button below:`;
       quickReplies = ['💳 Go to Checkout', '🛒 View Cart', '🍔 Add More Items'];
     }
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -400,7 +518,7 @@ export async function processLocalChatMessage(
       reply = `I couldn't find an active order for this session.\n\nIf you placed an order earlier with an Order ID, you can type it (e.g. *SF123456*), or place a new order from our menu!`;
       quickReplies = ['🍔 Browse Menu', '🔥 Best Sellers', '📞 Support'];
     }
-    return { message: reply, actions, sessionMemory: memory, suggestedQuickReplies: quickReplies };
+    return { message: reply, actions, sessionMemory: memory, suggestedQuickReplies: quickReplies, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -413,7 +531,7 @@ export async function processLocalChatMessage(
     recommendedProducts = [matchedProd];
     reply = `**${matchedProd.name}** is **₹${matchedProd.price}** ${matchedProd.originalPrice ? `~~₹${matchedProd.originalPrice}~~` : ''} ⭐ ${matchedProd.rating}/5 (${matchedProd.reviewCount} reviews)\n\n${matchedProd.longDescription}\n\n• **Key Ingredients:** ${matchedProd.ingredients.join(', ')}\n• **100% Vegetarian:** Yes\n• **Spice Level:** ${matchedProd.spiceLevel === 0 ? 'Mild' : matchedProd.spiceLevel === 1 ? 'Medium' : 'Hot 🌶️'}\n\nWould you like me to add this to your cart?`;
     quickReplies = [`🛒 Add 1 ${matchedProd.name}`, `🛒 Add 2 ${matchedProd.name}`, '🍔 Explore More', '🔥 Best Sellers'];
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -425,7 +543,7 @@ export async function processLocalChatMessage(
     memory.lastRecommendedProductIds = recommendedProducts.map((p) => p.id);
     reply = `Our most popular customer favorites at Sigma Foods include:\n\n• **🥟 Veg Momos** — ₹99 (⭐ 4.9, freshly steamed/fried with homemade spicy chutney)\n• **🍔 Classic Burger** — ₹149 (⭐ 4.8, crispy patty with secret sauce)\n• **🍝 White Sauce Pasta** — ₹179 (⭐ 4.9, creamy Italian cheese delight)\n• **🌯 Cigar Rolls** — ₹129 (⭐ 4.7, golden crispy rolls with cheese dip)\n\nWhich one would you like to try?`;
     quickReplies = ['🥟 Veg Momos', '🍔 Classic Burger', '🍝 White Sauce Pasta', '🌯 Cigar Rolls'];
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -456,7 +574,7 @@ export async function processLocalChatMessage(
       recommendedProducts = BEST_SELLERS.slice(0, 3);
       quickReplies = ['🥟 Momos under ₹100', '🍔 Burgers', '🍟 Fries'];
     }
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -467,7 +585,7 @@ export async function processLocalChatMessage(
     quickReplies = ['🍔 Burger', '🥟 Momos', '🍝 Pasta', '🌯 Cigar Rolls', '🍟 Fries', '🥤 Beverage'];
     recommendedProducts = BEST_SELLERS.slice(0, 3);
     memory.lastRecommendedProductIds = recommendedProducts.map((p) => p.id);
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -484,7 +602,7 @@ export async function processLocalChatMessage(
       const listStr = catProducts.map((p) => `• **${p.emoji} ${p.name}** — ₹${p.price} (${p.description})`).join('\n');
       reply = `Here are our top **${cat}** options:\n\n${listStr}\n\nWhich one would you like to order?`;
       quickReplies = catProducts.slice(0, 3).map((p) => `Add ${p.name}`);
-      return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+      return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
     }
   }
 
@@ -501,7 +619,7 @@ export async function processLocalChatMessage(
     const listStr = spicyItems.map((p) => `• 🌶️ **${p.name}** — ₹${p.price} (${p.badge || 'Spicy Kick'})`).join('\n');
     reply = `Sure! 🌶️ If you love spice, you will love these:\n\n${listStr}\n\nWhat would you like me to add to your cart?`;
     quickReplies = spicyItems.slice(0, 3).map((p) => `Add ${p.name}`);
-    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, recommendedProducts, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -511,7 +629,7 @@ export async function processLocalChatMessage(
     actions.push({ type: 'GET_RESTAURANT_INFO', url: 'https://maps.app.goo.gl/sigma-foods' });
     reply = `📍 **Sigma Foods Location:**\n\n${RESTAURANT_INFO.location}\n\nWe are located right in Sector 2, Rohini, Delhi. You can dine in, take away, or order online right here!`;
     quickReplies = ['📍 Get Directions', '📞 Call Sigma Foods', '🍔 Browse Menu'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -521,7 +639,7 @@ export async function processLocalChatMessage(
     actions.push({ type: 'GET_BUSINESS_HOURS' });
     reply = `🕐 **Sigma Foods Business Hours:**\n\n• **${RESTAURANT_INFO.hoursWeekday}**\n• **${RESTAURANT_INFO.hoursSunday}**\n\nWe are open 7 days a week, serving fresh vegetarian food!`;
     quickReplies = ['🍔 Order Now', '📍 Location', '📞 Call Support'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -531,7 +649,7 @@ export async function processLocalChatMessage(
     actions.push({ type: 'CONTACT_SUPPORT' });
     reply = `📞 **You can reach Sigma Foods directly:**\n\n• **Phone:** [${RESTAURANT_INFO.phone}](tel:+917838853490)\n• **Email:** foodssigma@gmail.co\n• **Address:** ${RESTAURANT_INFO.shortLocation}\n\nOur team is always happy to assist you!`;
     quickReplies = ['📞 Call +91 7838853490', '✉️ Email Support', '📍 Get Directions'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -540,7 +658,7 @@ export async function processLocalChatMessage(
   if (lower.includes('veg') || lower.includes('vegetarian') || lower.includes('non veg') || lower.includes('halal') || lower.includes('egg')) {
     reply = `🌱 **100% Pure Vegetarian!**\n\nSigma Foods is strictly 100% pure vegetarian. All our momos, burgers, pastas, sauces, and dips are freshly prepared with hygienic vegetarian ingredients and fresh produce daily.`;
     quickReplies = ['🍔 Browse Menu', '🔥 Best Sellers', '🥟 Veg Momos'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -549,7 +667,7 @@ export async function processLocalChatMessage(
   if (lower.includes('delivery') || lower.includes('shipping') || lower.includes('charges')) {
     reply = `🚀 **Delivery Details:**\n\n• **Free Delivery:** On all orders above ₹299!\n• **Standard Delivery:** Only ₹30 for orders under ₹299.\n• **Estimated Time:** ${RESTAURANT_INFO.deliveryTime}.`;
     quickReplies = ['🍔 Browse Menu', '🛒 View Cart', '💳 Checkout'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -558,7 +676,7 @@ export async function processLocalChatMessage(
   if (lower.includes('coupon') || lower.includes('discount') || lower.includes('offer') || lower.includes('promo') || lower.includes('code')) {
     reply = `🎉 **Current Special Coupons for You:**\n\n• **SIGMA10** — 10% instant discount on any order\n• **SIGMA20** — 20% discount on orders above ₹499\n• **FIRSTORDER** — 15% discount for new customers\n\nYou can apply any of these coupon codes directly inside your cart!`;
     quickReplies = ['🛒 Go to Cart', '🍔 Explore Menu', '🔥 Best Sellers'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -567,7 +685,7 @@ export async function processLocalChatMessage(
   if (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower.includes('namaste') || lower.includes('good morning') || lower.includes('good evening')) {
     reply = `Hi! 👋 I'm **Sigma AI**, your Sigma Foods food assistant.\n\nI can help you:\n🍔 Choose delicious food\n🛒 Build your order\n📦 Track your order\n💬 Answer questions about our cafe\n\nWhat can I get for you today?`;
     quickReplies = ['🍔 Browse Menu', '🔥 Best Sellers', '🛒 My Cart', '📦 Track Order', '💬 Support'];
-    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory };
+    return { message: reply, actions, suggestedQuickReplies: quickReplies, sessionMemory: memory, modelUsed: 'Sigma AI Engine' };
   }
 
   // ------------------------------------------------------------
@@ -593,11 +711,12 @@ export async function processLocalChatMessage(
     recommendedProducts,
     suggestedQuickReplies: quickReplies,
     sessionMemory: memory,
+    modelUsed: 'Sigma AI Engine',
   };
 }
 
 // ============================================================
-// CHAT SERVICE CLIENT (API LAYER WITH SEAMLESS LOCAL ENGINE FALLBACK)
+// CHAT SERVICE CLIENT (API LAYER WITH CHATGPT + LOCAL ENGINE FALLBACK)
 // ============================================================
 
 export class ChatService {
@@ -617,29 +736,74 @@ export class ChatService {
     return this.sessionMemory;
   }
 
+  public static getApiKey(): string {
+    return localStorage.getItem('sigma_openai_api_key') || (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
+  }
+
+  public static setApiKey(key: string): void {
+    if (!key) localStorage.removeItem('sigma_openai_api_key');
+    else localStorage.setItem('sigma_openai_api_key', key.trim());
+  }
+
+  public static getModel(): string {
+    return localStorage.getItem('sigma_openai_model') || 'gpt-4o-mini';
+  }
+
+  public static setModel(model: string): void {
+    localStorage.setItem('sigma_openai_model', model);
+  }
+
   /**
    * Main send function called by frontend UI.
-   * Attempts POST /api/chat. If unavailable or returns error,
-   * gracefully falls back to the local client AI engine so
-   * user never experiences errors or dropped responses.
+   * Priority:
+   * 1. If OpenAI API Key is configured -> Calls ChatGPT API with real menu context!
+   * 2. If Backend POST /api/chat is active -> Calls backend API
+   * 3. Fallback -> Executes local high-accuracy AI engine.
+   * Persists chat history to IndexedDB / Database.
    */
   public static async sendMessage(userMessage: string, currentCart: CartItem[]): Promise<ChatResponse> {
-    const payload: ChatRequest = {
-      message: userMessage,
+    // Log user message to database
+    db.saveChatMessage({
+      id: `msg_u_${Date.now()}`,
       conversationId: this.conversationId,
-      cart: currentCart,
-      sessionMemory: this.sessionMemory,
-    };
+      sender: 'user',
+      text: userMessage,
+      timestamp: new Date().toISOString(),
+    });
 
-    // Attempt backend API if running
+    // 1. Try ChatGPT if user provided OpenAI Key
+    const apiKey = this.getApiKey();
+    if (apiKey && apiKey.startsWith('sk-')) {
+      const gptResult = await callChatGPT(userMessage, apiKey, this.getModel(), currentCart, this.sessionMemory);
+      if (gptResult) {
+        this.sessionMemory = gptResult.sessionMemory;
+        // Save assistant message to database
+        db.saveChatMessage({
+          id: `msg_a_${Date.now()}`,
+          conversationId: this.conversationId,
+          sender: 'assistant',
+          text: gptResult.message,
+          timestamp: new Date().toISOString(),
+          metadata: { model: gptResult.modelUsed },
+        });
+        return gptResult;
+      }
+    }
+
+    // 2. Attempt backend API if running
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1800); // 1.8s timeout for snappy local fallback
+      const timeoutId = setTimeout(() => controller.abort(), 1800);
 
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          message: userMessage,
+          conversationId: this.conversationId,
+          cart: currentCart,
+          sessionMemory: this.sessionMemory,
+        }),
         signal: controller.signal,
       });
 
@@ -650,15 +814,31 @@ export class ChatService {
         if (data.sessionMemory) {
           this.sessionMemory = { ...this.sessionMemory, ...data.sessionMemory };
         }
+        db.saveChatMessage({
+          id: `msg_a_${Date.now()}`,
+          conversationId: this.conversationId,
+          sender: 'assistant',
+          text: data.message,
+          timestamp: new Date().toISOString(),
+          metadata: { model: 'Backend API' },
+        });
         return data;
       }
-    } catch {
-      // Backend not running or timeout -> seamlessly use local engine
-    }
+    } catch {}
 
-    // Process via local high-accuracy AI engine
+    // 3. Process via local high-accuracy AI engine
     const localResult = await processLocalChatMessage(userMessage, this.sessionMemory, currentCart);
     this.sessionMemory = localResult.sessionMemory;
+
+    db.saveChatMessage({
+      id: `msg_a_${Date.now()}`,
+      conversationId: this.conversationId,
+      sender: 'assistant',
+      text: localResult.message,
+      timestamp: new Date().toISOString(),
+      metadata: { model: 'Sigma AI Engine' },
+    });
+
     return localResult;
   }
 }

@@ -3,19 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ChefHat, Package, DollarSign, Users, Star, CheckCircle, Clock,
-  Truck, ArrowLeft, LogOut, ToggleLeft, ToggleRight, Search, Eye
+  Truck, ArrowLeft, LogOut, ToggleLeft, ToggleRight, Search, Eye,
+  Database, Smartphone, Sparkles, Check
 } from 'lucide-react';
 import { useOrdersStore, useAuthStore } from '../store';
 import { PRODUCTS, type Product } from '../data/products';
+import { db, type DbUser, type DbChatMessage } from '../services/db';
 import toast from 'react-hot-toast';
 
 export default function AdminPage() {
   const navigate = useNavigate();
   const { orders, updateStatus } = useOrdersStore();
   const { user, logout } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'stats'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'database'>('orders');
   const [productSearch, setProductSearch] = useState('');
   const [productList, setProductList] = useState<Product[]>(PRODUCTS);
+  const [dbUsers, setDbUsers] = useState<DbUser[]>([]);
+  const [dbChats, setDbChats] = useState<DbChatMessage[]>([]);
+
+  useState(() => {
+    db.getAllUsers().then(setDbUsers);
+    db.getChatHistory().then(setDbChats);
+  });
+
+  const refreshDatabase = async () => {
+    const users = await db.getAllUsers();
+    const chats = await db.getChatHistory();
+    setDbUsers(users);
+    setDbChats(chats);
+    toast.success('Database refreshed! 🔄');
+  };
 
   const toggleAvailability = (id: string) => {
     setProductList(prev =>
@@ -177,10 +194,14 @@ export default function AdminPage() {
           {[
             { id: 'orders', label: `Orders (${allOrders.length})` },
             { id: 'products', label: `Menu Items (${productList.length})` },
+            { id: 'database', label: `Database Inspector 🗄️ (${dbUsers.length} Users)` },
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'orders' | 'products')}
+              onClick={() => {
+                setActiveTab(tab.id as 'orders' | 'products' | 'database');
+                if (tab.id === 'database') refreshDatabase();
+              }}
               className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all cursor-pointer ${
                 activeTab === tab.id
                   ? 'bg-[#f5a623] text-[#070707] shadow-[0_0_15px_rgba(245,166,35,0.3)]'
@@ -324,6 +345,140 @@ export default function AdminPage() {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Database Inspector (Live IndexedDB Records) */}
+        {activeTab === 'database' && (
+          <div className="space-y-6 animate-fade-up">
+            {/* Database Engine Status */}
+            <div className="p-6 rounded-2xl bg-[rgba(245,166,35,0.06)] border border-[rgba(245,166,35,0.25)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-[#f5a623]/20 flex items-center justify-center text-[#f5a623]">
+                  <Database size={24} />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-base flex items-center gap-2">
+                    SigmaFoodsDB <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">IndexedDB Active</span>
+                  </h3>
+                  <p className="text-white/50 text-xs mt-0.5">
+                    Real browser database engine with persistent tables for Users, Orders, and Chat Logs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={refreshDatabase}
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw size={13} /> Refresh Records
+                </button>
+              </div>
+            </div>
+
+            {/* 1. USERS TABLE */}
+            <div className="glass rounded-2xl p-6 border border-white/8 bg-[#0c0c0c]">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-white font-bold text-base flex items-center gap-2">
+                    <Users size={18} className="text-[#f5a623]" />
+                    Registered Users ({dbUsers.length})
+                  </h4>
+                  <p className="text-white/40 text-xs">Accounts created via Google, Phone OTP, or Email</p>
+                </div>
+              </div>
+
+              {dbUsers.length === 0 ? (
+                <div className="py-8 text-center text-white/40 text-sm">
+                  No custom users saved in DB yet. Login with Google or Phone OTP to populate!
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-white/10 text-white/50 font-semibold uppercase tracking-wider">
+                        <th className="py-3 px-3">User</th>
+                        <th className="py-3 px-3">Auth Method</th>
+                        <th className="py-3 px-3">Phone</th>
+                        <th className="py-3 px-3">Registered At</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-white/80">
+                      {dbUsers.map((u) => (
+                        <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-3">
+                            <div className="flex items-center gap-2.5">
+                              {u.avatar ? (
+                                <img src={u.avatar} alt={u.name} className="w-7 h-7 rounded-full object-cover" />
+                              ) : (
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f5a623] to-[#ff6b35] flex items-center justify-center font-bold text-white text-[10px]">
+                                  {u.name.slice(0, 1).toUpperCase()}
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-bold text-white">{u.name}</p>
+                                <p className="text-white/40 text-[11px]">{u.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                              u.authProvider === 'google'
+                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                : u.authProvider === 'phone'
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                            }`}>
+                              {u.authProvider === 'google' ? 'Google' : u.authProvider === 'phone' ? 'Phone OTP' : 'Email/Password'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 font-mono">{u.phone || 'N/A'}</td>
+                          <td className="py-3 px-3 text-white/40">{new Date(u.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* 2. CHATBOT AUDIT LOGS */}
+            <div className="glass rounded-2xl p-6 border border-white/8 bg-[#0c0c0c]">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-white font-bold text-base flex items-center gap-2">
+                    <Sparkles size={18} className="text-[#f5a623]" />
+                    AI Chatbot Activity Logs ({dbChats.length})
+                  </h4>
+                  <p className="text-white/40 text-xs">Customer interactions recorded in database</p>
+                </div>
+              </div>
+
+              {dbChats.length === 0 ? (
+                <div className="py-8 text-center text-white/40 text-sm">
+                  No chatbot queries logged yet. Chat with Sigma AI to see live records!
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                  {dbChats.slice(-15).reverse().map((c) => (
+                    <div key={c.id} className="p-3 rounded-xl bg-white/3 border border-white/5 flex items-start justify-between gap-3 text-xs">
+                      <div className="min-w-0 flex-1">
+                        <span className={`inline-block px-1.5 py-0.2 rounded font-bold text-[9px] uppercase tracking-wider mb-1 ${
+                          c.sender === 'user' ? 'bg-[#f5a623]/20 text-[#f5a623]' : 'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {c.sender === 'user' ? 'Customer' : 'Sigma AI'}
+                        </span>
+                        <p className="text-white/85 truncate">{c.text}</p>
+                      </div>
+                      <span className="text-white/30 text-[10px] shrink-0">
+                        {new Date(c.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

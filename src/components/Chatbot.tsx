@@ -20,6 +20,9 @@ import {
   Flame,
   Star,
   Package,
+  Settings,
+  Sliders,
+  Cpu,
 } from 'lucide-react';
 import {
   ChatService,
@@ -42,6 +45,7 @@ interface Message {
   recommendedProducts?: Product[];
   suggestedQuickReplies?: string[];
   actions?: ChatAction[];
+  modelUsed?: string;
 }
 
 const INITIAL_QUICK_ACTIONS = [
@@ -66,6 +70,9 @@ export default function Chatbot() {
   const [isTyping, setIsTyping] = useState(false);
   const [addedProductIds, setAddedProductIds] = useState<Record<string, boolean>>({});
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKey, setApiKey] = useState(ChatService.getApiKey());
+  const [model, setModel] = useState(ChatService.getModel());
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -147,6 +154,7 @@ export default function Chatbot() {
           recommendedProducts: response.recommendedProducts,
           suggestedQuickReplies: response.suggestedQuickReplies,
           actions: response.actions,
+          modelUsed: response.modelUsed,
         };
 
         setMessages((prev) => [...prev, botMsg]);
@@ -344,6 +352,17 @@ export default function Chatbot() {
               {/* Action buttons */}
               <div className="flex items-center gap-1 text-white/60">
                 <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  title="AI & ChatGPT Settings"
+                  className={`p-2 rounded-xl transition-all ${
+                    showSettings || apiKey
+                      ? 'text-[#f5a623] bg-[rgba(245,166,35,0.15)] border border-[rgba(245,166,35,0.25)]'
+                      : 'hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Settings size={16} />
+                </button>
+                <button
                   onClick={handleResetChat}
                   title="Reset Conversation"
                   className="p-2 rounded-xl hover:text-white hover:bg-white/5 transition-all"
@@ -366,6 +385,80 @@ export default function Chatbot() {
                 </button>
               </div>
             </div>
+
+            {/* ── CHATGPT / AI SETTINGS DRAWER ──────────────────── */}
+            {showSettings && (
+              <div className="relative z-20 p-4 bg-[#141414] border-b border-white/10 animate-fade-up">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Cpu size={16} className="text-[#f5a623]" />
+                    <span className="text-white text-xs font-bold">ChatGPT & AI Engine Settings</span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    apiKey ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-white/10 text-white/60'
+                  }`}>
+                    {apiKey ? 'ChatGPT Active' : 'Sigma AI (Local)'}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-white/50 text-[11px] mb-1">OpenAI API Key (Optional)</label>
+                    <input
+                      type="password"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      placeholder="sk-proj-..."
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs placeholder-white/20 focus:outline-none focus:border-[#f5a623]"
+                    />
+                    <p className="text-[10px] text-white/40 mt-1">
+                      Leave empty to use built-in Sigma AI Engine (Free, no key required).
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-white/50 text-[11px] mb-1">Model Selection</label>
+                    <select
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-[#0c0c0c] border border-white/10 text-white text-xs focus:outline-none focus:border-[#f5a623]"
+                    >
+                      <option value="gpt-4o-mini">GPT-4o Mini (Fast & Smart)</option>
+                      <option value="gpt-4o">GPT-4o (Ultra Intelligent)</option>
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    </select>
+                  </div>
+
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        ChatService.setApiKey(apiKey);
+                        ChatService.setModel(model);
+                        setShowSettings(false);
+                        toast.success(apiKey ? 'ChatGPT connected successfully! 🤖' : 'Using built-in Sigma AI Engine');
+                      }}
+                      className="flex-1 py-2 rounded-xl bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] font-bold text-xs hover:shadow-lg transition-all"
+                    >
+                      Save Settings
+                    </button>
+                    {apiKey && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setApiKey('');
+                          ChatService.setApiKey('');
+                          toast.success('Cleared OpenAI API Key');
+                        }}
+                        className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-red-400 text-xs transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* ── MESSAGES CONTAINER ────────────────────────────── */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
@@ -510,8 +603,13 @@ export default function Chatbot() {
                       </div>
                     </div>
 
-                    {/* Timestamp */}
-                    <span className="text-[10px] text-white/30 px-9 mt-1">{msg.timestamp}</span>
+                    {/* Timestamp & Model info */}
+                    <div className="flex items-center gap-2 px-9 mt-1 text-[10px] text-white/30">
+                      <span>{msg.timestamp}</span>
+                      {!isUser && msg.modelUsed && (
+                        <span className="text-[#f5a623]/80 font-medium">• {msg.modelUsed}</span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
