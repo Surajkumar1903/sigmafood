@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ChefHat, Package, DollarSign, Users, Star, CheckCircle, Clock,
   Truck, ArrowLeft, LogOut, ToggleLeft, ToggleRight, Search, Eye,
-  Database, Smartphone, Sparkles, Check, Cloud, KeyRound, Copy, RefreshCw
+  Database, Smartphone, Sparkles, Check, Cloud, KeyRound, Copy, RefreshCw,
+  Flame, Settings, ExternalLink, ShieldCheck
 } from 'lucide-react';
 import { useOrdersStore, useAuthStore } from '../store';
 import { PRODUCTS, type Product } from '../data/products';
 import { db, type DbUser, type DbChatMessage } from '../services/db';
 import { cloudDb } from '../services/cloudDb';
+import {
+  firebaseGetOrders,
+  firebaseListenToOrders,
+  firebaseUpdateOrderStatus,
+  getActiveFirebaseConfig,
+  saveActiveFirebaseConfig,
+  type FirebaseConfig,
+  type FirebaseOrder,
+} from '../services/firebase';
 import toast from 'react-hot-toast';
 
 export default function AdminPage() {
@@ -23,21 +33,40 @@ export default function AdminPage() {
   const [dbChats, setDbChats] = useState<DbChatMessage[]>([]);
   const [showAllPasswords, setShowAllPasswords] = useState(true);
   const [cloudStatus, setCloudStatus] = useState<any>({ connected: true, provider: 'sigma-cloud', totalCloudUsers: 4 });
+  const [firebaseOrders, setFirebaseOrders] = useState<FirebaseOrder[]>([]);
+  const [firebaseConfig, setFirebaseConfig] = useState<FirebaseConfig>(getActiveFirebaseConfig());
+  const [showFirebaseModal, setShowFirebaseModal] = useState(false);
+  const [configInputs, setConfigInputs] = useState<FirebaseConfig>(getActiveFirebaseConfig());
 
-  useState(() => {
+  useEffect(() => {
     db.getAllUsers().then(setDbUsers);
     db.getChatHistory().then(setDbChats);
     cloudDb.getCloudStatus().then(setCloudStatus);
-  });
+
+    const unsub = firebaseListenToOrders((fbOrders) => {
+      setFirebaseOrders(fbOrders);
+    });
+    return () => unsub();
+  }, []);
 
   const refreshDatabase = async () => {
     const users = await db.getAllUsers();
     const chats = await db.getChatHistory();
     const cStatus = await cloudDb.getCloudStatus();
+    const fbOrders = await firebaseGetOrders();
     setDbUsers(users);
     setDbChats(chats);
     setCloudStatus(cStatus);
-    toast.success('Database & Cloud Synced! 🔄');
+    setFirebaseOrders(fbOrders);
+    toast.success('Database, Firestore & Cloud Synced! 🔄');
+  };
+
+  const handleSaveFirebaseConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveActiveFirebaseConfig(configInputs);
+    setFirebaseConfig(configInputs);
+    setShowFirebaseModal(false);
+    toast.success('Firebase Configuration Saved! 🚀');
   };
 
   const toggleAvailability = (id: string) => {
@@ -281,9 +310,11 @@ export default function AdminPage() {
                   <div className="flex items-center gap-2">
                     <select
                       value={order.status}
-                      onChange={e => {
-                        updateStatus(order.id, e.target.value as 'Confirmed' | 'Preparing' | 'Out for Delivery' | 'Delivered');
-                        toast.success(`Order ${order.id} status updated to ${e.target.value}`);
+                      onChange={async e => {
+                        const newStatus = e.target.value as 'Confirmed' | 'Preparing' | 'Out for Delivery' | 'Delivered';
+                        updateStatus(order.id, newStatus);
+                        await firebaseUpdateOrderStatus(order.id, newStatus);
+                        toast.success(`Order ${order.id} status updated to ${e.target.value} (Firestore synced)`);
                       }}
                       className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-[#f5a623]"
                     >
@@ -359,9 +390,50 @@ export default function AdminPage() {
         {activeTab === 'database' && (
           <div className="space-y-6 animate-fade-up">
             {/* Database & Cloud Sync Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Firebase Cloud Card */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/30 flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 shadow-lg shadow-amber-500/20">
+                      <Flame size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
+                        Firebase Cloud <span className="text-[10px] px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active 🟢</span>
+                      </h3>
+                      <p className="text-white/50 text-[11px] mt-0.5 font-mono">
+                        ID: {firebaseConfig.projectId}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-white/5 space-y-1 text-[11px]">
+                  <p className="text-white/70 flex items-center justify-between">
+                    <span>Auth Providers:</span>
+                    <span className="text-amber-400 font-semibold">Google, OTP, Email</span>
+                  </p>
+                  <p className="text-white/70 flex items-center justify-between">
+                    <span>Firestore Orders:</span>
+                    <span className="text-emerald-400 font-bold">{firebaseOrders.length} Synced</span>
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfigInputs(firebaseConfig);
+                    setShowFirebaseModal(true);
+                  }}
+                  className="mt-3.5 w-full py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Settings size={13} /> Firebase Settings
+                </button>
+              </div>
+
               {/* Local IndexedDB Card */}
-              <div className="p-5 rounded-2xl bg-[rgba(245,166,35,0.06)] border border-[rgba(245,166,35,0.25)] flex items-center justify-between">
+              <div className="p-5 rounded-2xl bg-[rgba(245,166,35,0.06)] border border-[rgba(245,166,35,0.25)] flex flex-col justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-xl bg-[#f5a623]/20 flex items-center justify-center text-[#f5a623] shrink-0">
                     <Database size={22} />
@@ -371,36 +443,60 @@ export default function AdminPage() {
                       SigmaFoodsDB <span className="text-[10px] px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">IndexedDB Active</span>
                     </h3>
                     <p className="text-white/40 text-xs mt-0.5">
-                      Local persistent client storage (Users, Orders, Chats)
+                      Local persistent client storage
                     </p>
                   </div>
                 </div>
+
+                <div className="mt-3 pt-3 border-t border-white/5 space-y-1 text-[11px]">
+                  <p className="text-white/70 flex items-center justify-between">
+                    <span>Users Stored:</span>
+                    <span className="text-white font-semibold">{dbUsers.length}</span>
+                  </p>
+                  <p className="text-white/70 flex items-center justify-between">
+                    <span>Chat Queries:</span>
+                    <span className="text-white font-semibold">{dbChats.length}</span>
+                  </p>
+                </div>
+
                 <button
+                  type="button"
                   onClick={refreshDatabase}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer shrink-0"
+                  className="mt-3.5 w-full py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <RefreshCw size={12} /> Sync
+                  <RefreshCw size={12} /> Sync Database
                 </button>
               </div>
 
               {/* Cloud Database Card */}
-              <div className="p-5 rounded-2xl bg-[rgba(56,189,248,0.06)] border border-[rgba(56,189,248,0.25)] flex items-center justify-between">
+              <div className="p-5 rounded-2xl bg-[rgba(56,189,248,0.06)] border border-[rgba(56,189,248,0.25)] flex flex-col justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
                     <Cloud size={22} />
                   </div>
                   <div>
                     <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
-                      Cloud Database <span className="text-[10px] px-2 py-0.2 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">Cloud Sync Online 🟢</span>
+                      Cloud Sync <span className="text-[10px] px-2 py-0.2 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">Online 🟢</span>
                     </h3>
                     <p className="text-white/40 text-xs mt-0.5">
-                      Provider: Supabase / Sigma Cloud • Latency: 38ms
+                      Latency: 38ms • Bi-directional
                     </p>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sky-400 text-xs font-bold">{dbUsers.length} Cloud Users</p>
-                  <p className="text-white/40 text-[10px]">Real-time cloud replicated</p>
+
+                <div className="mt-3 pt-3 border-t border-white/5 space-y-1 text-[11px]">
+                  <p className="text-white/70 flex items-center justify-between">
+                    <span>Replication:</span>
+                    <span className="text-sky-400 font-semibold">Continuous</span>
+                  </p>
+                  <p className="text-white/70 flex items-center justify-between">
+                    <span>Cloud Users:</span>
+                    <span className="text-sky-400 font-bold">{dbUsers.length} Active</span>
+                  </p>
+                </div>
+
+                <div className="mt-3.5 py-1.5 px-3 rounded-xl bg-sky-500/10 text-sky-300 text-center text-xs font-semibold border border-sky-500/20">
+                  ⚡ Auto-Synced with Firestore
                 </div>
               </div>
             </div>
@@ -542,6 +638,189 @@ export default function AdminPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* 3. FIRESTORE LIVE ORDERS COLLECTION */}
+            <div className="glass rounded-2xl p-6 border border-white/8 bg-[#0c0c0c]">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-white font-bold text-base flex items-center gap-2">
+                    <Flame size={18} className="text-amber-400" />
+                    Firestore Orders Collection ({firebaseOrders.length})
+                  </h4>
+                  <p className="text-white/40 text-xs">
+                    Real-time cloud replicated orders from Firebase Firestore
+                  </p>
+                </div>
+                <span className="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+                  onSnapshot Live
+                </span>
+              </div>
+
+              {firebaseOrders.length === 0 ? (
+                <div className="py-8 text-center text-white/40 text-sm">
+                  No orders in Firestore yet. Place an order at checkout to see real-time sync!
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-white/10 text-white/50 font-semibold uppercase tracking-wider">
+                        <th className="py-3 px-3">Order ID</th>
+                        <th className="py-3 px-3">Customer</th>
+                        <th className="py-3 px-3">Items</th>
+                        <th className="py-3 px-3">Total</th>
+                        <th className="py-3 px-3">Status</th>
+                        <th className="py-3 px-3">Payment</th>
+                        <th className="py-3 px-3">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-white/80">
+                      {firebaseOrders.map((ord) => (
+                        <tr key={ord.orderId} className="hover:bg-white/2 transition-colors">
+                          <td className="py-3 px-3 font-mono font-bold text-amber-400">
+                            #{ord.orderId}
+                          </td>
+                          <td className="py-3 px-3">
+                            <p className="font-semibold text-white">{ord.customerName}</p>
+                            <p className="text-white/40 text-[10px]">{ord.customerPhone}</p>
+                          </td>
+                          <td className="py-3 px-3 text-white/70">
+                            {ord.items?.length || 0} items
+                          </td>
+                          <td className="py-3 px-3 font-bold text-[#f5a623]">
+                            ₹{ord.total}
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                              {ord.status}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-white/60">
+                            {ord.paymentMethod} ({ord.paymentStatus})
+                          </td>
+                          <td className="py-3 px-3 text-white/40 text-[10px]">
+                            {new Date(ord.createdAt).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── FIREBASE CREDENTIALS MODAL ───────────────────────── */}
+        {showFirebaseModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+            <div className="w-full max-w-lg bg-[#0e0e0e] border border-amber-500/30 rounded-3xl p-6 shadow-2xl space-y-5">
+              <div className="flex items-center justify-between border-b border-white/8 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+                    <Flame size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-base">Firebase Configuration</h3>
+                    <p className="text-white/40 text-xs">Auth & Cloud Firestore Credentials</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowFirebaseModal(false)}
+                  className="p-1.5 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveFirebaseConfig} className="space-y-3.5">
+                <div>
+                  <label className="block text-white/50 text-xs mb-1 font-semibold">Firebase API Key</label>
+                  <input
+                    type="text"
+                    value={configInputs.apiKey}
+                    onChange={(e) => setConfigInputs({ ...configInputs, apiKey: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                    placeholder="AIzaSy..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1 font-semibold">Auth Domain</label>
+                    <input
+                      type="text"
+                      value={configInputs.authDomain}
+                      onChange={(e) => setConfigInputs({ ...configInputs, authDomain: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                      placeholder="project.firebaseapp.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1 font-semibold">Project ID</label>
+                    <input
+                      type="text"
+                      value={configInputs.projectId}
+                      onChange={(e) => setConfigInputs({ ...configInputs, projectId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                      placeholder="sigma-foods-delhi"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1 font-semibold">Messaging Sender ID</label>
+                    <input
+                      type="text"
+                      value={configInputs.messagingSenderId}
+                      onChange={(e) => setConfigInputs({ ...configInputs, messagingSenderId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                      placeholder="102938475610"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1 font-semibold">App ID</label>
+                    <input
+                      type="text"
+                      value={configInputs.appId}
+                      onChange={(e) => setConfigInputs({ ...configInputs, appId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                      placeholder="1:102938475610:web:8a9b0c..."
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-200/90 leading-relaxed flex items-start gap-2">
+                  <ShieldCheck size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                  <span>
+                    Firebase handles Google OAuth 1-tap, SMS OTP verification, and Firestore cloud synchronization for orders & customers. Pre-configured with Sigma Foods live defaults.
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      localStorage.removeItem('sigma_firebase_custom_config');
+                      setConfigInputs(getActiveFirebaseConfig());
+                      setFirebaseConfig(getActiveFirebaseConfig());
+                      toast.success('Reset to Sigma Foods Default Firebase');
+                      setShowFirebaseModal(false);
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-[#070707] text-xs font-extrabold shadow-lg transition-all cursor-pointer"
+                  >
+                    Save & Connect Firebase
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

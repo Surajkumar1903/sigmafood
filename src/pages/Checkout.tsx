@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Check, MapPin, Package, CreditCard, Smartphone, Banknote, ChevronRight } from 'lucide-react';
 import { useCartStore, useAuthStore, useOrdersStore } from '../store';
 import type { Address } from '../store';
+import { firebaseSaveOrder } from '../services/firebase';
 import toast from 'react-hot-toast';
 
 const STEPS = ['Delivery Address', 'Order Summary', 'Payment'] as const;
@@ -12,7 +13,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(0);
   const { items, getTotal, getSubtotal, getDeliveryFee, getTax, discount, clearCart } = useCartStore();
-  const { addresses } = useAuthStore();
+  const { user } = useAuthStore();
   const addOrder = useOrdersStore(s => s.addOrder);
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'COD'>('UPI');
   const [deliveryNote, setDeliveryNote] = useState('');
@@ -33,8 +34,36 @@ export default function CheckoutPage() {
       return;
     }
     setPlacing(true);
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 1200));
+
+    // Save in local Zustand store
     const orderId = addOrder({ items, total, status: 'Confirmed', address, paymentMethod });
+
+    // Save to Firebase Cloud Firestore
+    try {
+      await firebaseSaveOrder({
+        orderId,
+        items,
+        total,
+        subtotal,
+        deliveryFee,
+        tax,
+        discount: discountAmt,
+        status: 'Confirmed',
+        address,
+        paymentMethod,
+        paymentStatus: paymentMethod === 'COD' ? 'Cash on Delivery' : 'Paid',
+        customerName: address.fullName,
+        customerEmail: user?.email || `${address.phone}@customer.sigmafoods.com`,
+        customerPhone: address.phone,
+        createdAt: new Date().toISOString(),
+        notes: deliveryNote,
+      });
+      toast.success('Order synced to Firebase Cloud! ☁️📦');
+    } catch {
+      console.warn('Firebase order sync fallback');
+    }
+
     clearCart();
     setPlacing(false);
     navigate(`/order-success/${orderId}`);

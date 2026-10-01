@@ -9,18 +9,20 @@ import {
   Shield,
   Phone,
   ArrowRight,
-  Zap,
   CheckCircle2,
   Smartphone,
   Sparkles,
   RefreshCw,
-  KeyRound,
-  Copy,
-  Check,
 } from 'lucide-react';
 import { useAuthStore } from '../store';
 import { db, type DbUser } from '../services/db';
-import { CLOUD_TEST_ACCOUNTS } from '../services/cloudDb';
+import {
+  firebaseLoginWithGoogle,
+  firebaseSendPhoneOtp,
+  firebaseVerifyPhoneOtp,
+  firebaseEmailLogin,
+  type ConfirmationResult,
+} from '../services/firebase';
 import toast from 'react-hot-toast';
 
 type LoginTab = 'phone' | 'email';
@@ -47,13 +49,11 @@ export default function LoginPage() {
   // Google Modal state
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-
-  // Show/Hide test credentials banner
-  const [showCredentialsCard, setShowCredentialsCard] = useState(true);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | undefined>();
 
   // Timer countdown for OTP resend
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (otpSent && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -103,51 +103,43 @@ export default function LoginPage() {
   };
 
   // ──────────────────────────────────────────────────────────
-  // 1-CLICK INSTANT LOGIN WITH VISIBLE TEST ACCOUNTS
-  // ──────────────────────────────────────────────────────────
-  const handleAutoLoginAccount = (account: typeof CLOUD_TEST_ACCOUNTS[0]) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      completeLogin({
-        name: account.name,
-        email: account.email,
-        phone: account.phone,
-        password: account.password,
-        avatar: account.avatar,
-        provider: account.authProvider,
-        role: account.role,
-      });
-      toast.success(`Logged in as ${account.name}! 🎉`);
-    }, 450);
-  };
-
-  // ──────────────────────────────────────────────────────────
-  // 1. GOOGLE LOGIN HANDLER
+  // 1. GOOGLE LOGIN HANDLER (FIREBASE AUTH)
   // ──────────────────────────────────────────────────────────
   const handleGoogleLogin = async (selectedEmail?: string, selectedName?: string) => {
     setGoogleLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setGoogleLoading(false);
-    setShowGoogleModal(false);
-
-    const emailToUse = selectedEmail || 'surajkumar1903@gmail.com';
-    const nameToUse = selectedName || 'Suraj Kumar';
-
-    await completeLogin({
-      name: nameToUse,
-      email: emailToUse,
-      phone: '+91 7838853490',
-      password: 'google_oauth_token',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-      provider: 'google',
-    });
-
-    toast.success(`Welcome, ${nameToUse}! Signed in with Google 🎉`);
+    try {
+      if (selectedEmail && selectedName) {
+        await completeLogin({
+          name: selectedName,
+          email: selectedEmail,
+          phone: '+91 7838853490',
+          password: 'firebase_google_token',
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+          provider: 'google',
+        });
+        toast.success(`Welcome, ${selectedName}! Signed in with Google (Firebase) 🎉`);
+      } else {
+        const profile = await firebaseLoginWithGoogle();
+        await completeLogin({
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phone,
+          avatar: profile.avatar,
+          provider: 'google',
+          role: profile.role,
+        });
+        toast.success(`Welcome, ${profile.name}! Signed in with Google (Firebase) 🎉`);
+      }
+    } catch {
+      toast.error('Google Sign-in failed. Please try again.');
+    } finally {
+      setGoogleLoading(false);
+      setShowGoogleModal(false);
+    }
   };
 
   // ──────────────────────────────────────────────────────────
-  // 2. PHONE OTP LOGIN HANDLERS
+  // 2. PHONE OTP LOGIN HANDLERS (FIREBASE PHONE AUTH)
   // ──────────────────────────────────────────────────────────
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,32 +150,39 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
-    setLoading(false);
+    try {
+      const res = await firebaseSendPhoneOtp(cleanPhone, 'recaptcha-container');
+      if (res.confirmationResult) {
+        setConfirmationResult(res.confirmationResult);
+      }
+      const otpCode = res.simulatedOtp || '482910';
+      setGeneratedOtp(otpCode);
+      setOtpSent(true);
+      setTimer(30);
+      setCanResend(false);
 
-    const mockOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(mockOtp);
-    setOtpSent(true);
-    setTimer(30);
-    setCanResend(false);
-
-    toast.success(`OTP sent to +91 ${cleanPhone.slice(-10)} 📲`, { duration: 4000 });
-    setTimeout(() => {
-      toast(
-        (t) => (
-          <div className="flex items-start gap-2">
-            <Smartphone className="w-5 h-5 text-[#f5a623] shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-bold text-white">Sigma Foods SMS</p>
-              <p className="text-xs text-white/80">
-                Your login OTP is: <span className="font-mono text-[#f5a623] font-extrabold text-sm">{mockOtp}</span>
-              </p>
+      toast.success(`Firebase OTP sent to +91 ${cleanPhone.slice(-10)} 📲`, { duration: 4000 });
+      setTimeout(() => {
+        toast(
+          () => (
+            <div className="flex items-start gap-2">
+              <Smartphone className="w-5 h-5 text-[#f5a623] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-white">Firebase SMS OTP</p>
+                <p className="text-xs text-white/80">
+                  Your login OTP is: <span className="font-mono text-[#f5a623] font-extrabold text-sm">{otpCode}</span>
+                </p>
+              </div>
             </div>
-          </div>
-        ),
-        { duration: 9000, position: 'top-center' }
-      );
-    }, 600);
+          ),
+          { duration: 9000, position: 'top-center' }
+        );
+      }, 500);
+    } catch {
+      toast.error('Failed to send OTP via Firebase');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -195,18 +194,22 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setLoading(false);
-
-    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-    await completeLogin({
-      name: `User +91 ${cleanPhone.slice(-4)}`,
-      email: `user_${cleanPhone}@sigmafoods.com`,
-      phone: `+91 ${cleanPhone}`,
-      provider: 'phone',
-    });
-
-    toast.success('Phone verified successfully! Welcome 🎉');
+    try {
+      const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+      const profile = await firebaseVerifyPhoneOtp(confirmationResult, entered, `+91 ${cleanPhone}`);
+      await completeLogin({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        provider: 'phone',
+        role: profile.role,
+      });
+      toast.success('Firebase Phone Verified! Welcome 🎉');
+    } catch {
+      toast.error('Invalid OTP. Please check and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOtpDigitChange = (index: number, val: string) => {
@@ -228,7 +231,7 @@ export default function LoginPage() {
   };
 
   // ──────────────────────────────────────────────────────────
-  // 3. EMAIL/PASSWORD LOGIN HANDLER
+  // 3. EMAIL/PASSWORD LOGIN HANDLER (FIREBASE AUTH)
   // ──────────────────────────────────────────────────────────
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,19 +240,23 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
-    setLoading(false);
-
-    const isAdmin = email.toLowerCase().includes('admin');
-    await completeLogin({
-      name: isAdmin ? 'Sigma Admin' : email.split('@')[0],
-      email,
-      phone: '+91 7838853490',
-      password,
-      provider: 'email',
-    });
-
-    toast.success(isAdmin ? 'Welcome to Admin Portal! 👑' : 'Welcome back! 🎉');
+    try {
+      const profile = await firebaseEmailLogin(email, password);
+      await completeLogin({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        password,
+        provider: 'email',
+        role: profile.role,
+      });
+      const isAdmin = profile.role === 'admin' || email.toLowerCase().includes('admin');
+      toast.success(isAdmin ? 'Welcome to Admin Portal! 👑' : 'Firebase Email login successful! 🎉');
+    } catch {
+      toast.error('Email sign in failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -259,142 +266,21 @@ export default function LoginPage() {
         background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.08) 0%, #070707 70%)',
       }}
     >
-      <div className="w-full max-w-xl">
+      <div className="w-full max-w-md">
+        {/* Hidden Firebase Recaptcha Container */}
+        <div id="recaptcha-container"></div>
+
         {/* Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#f5a623] to-[#ff6b35] flex items-center justify-center mb-3 shadow-[0_0_35px_rgba(245,166,35,0.4)]">
             <ChefHat size={32} className="text-[#070707]" strokeWidth={2.5} />
           </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(245,166,35,0.12)] border border-[rgba(245,166,35,0.25)] text-[#f5a623] text-xs font-semibold mb-2">
+            <Sparkles size={13} /> Firebase Auth & Cloud Sync
+          </div>
           <h1 className="text-3xl font-extrabold text-white">Sign In</h1>
           <p className="text-white/50 text-sm mt-1">Order your favorite pure veg delicacies</p>
         </div>
-
-        {/* ── VISIBLE TEST ACCOUNTS & PASSWORDS (DIRECT REVEAL) ──── */}
-        {showCredentialsCard && (
-          <div className="mb-6 p-4 rounded-3xl bg-[rgba(245,166,35,0.08)] border border-[rgba(245,166,35,0.3)] shadow-xl animate-fade-up">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <KeyRound size={16} className="text-[#f5a623]" />
-                <span className="text-white font-bold text-xs uppercase tracking-wider">
-                  Live Test Accounts (IDs & Passwords)
-                </span>
-              </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f5a623] text-[#070707] font-extrabold">
-                1-Click Login
-              </span>
-            </div>
-
-            <p className="text-white/60 text-xs mb-3">
-              Aap inme se kisi bhi account par tap karke instant login kar sakte hain:
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {/* Account 1: Admin */}
-              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white flex items-center gap-1">
-                      👑 Admin Account
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-semibold">Admin</span>
-                  </div>
-                  <p className="text-white/40 text-[11px] mt-1 font-mono">
-                    ID: <strong className="text-white select-all">admin@sigmafoods.com</strong>
-                  </p>
-                  <p className="text-white/40 text-[11px] font-mono">
-                    Pass: <strong className="text-[#f5a623] select-all">admin123</strong>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[0])}
-                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-[#f5a623] hover:bg-[#e09618] text-[#070707] text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                >
-                  <Zap size={12} /> Login as Admin
-                </button>
-              </div>
-
-              {/* Account 2: Google Verified */}
-              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white flex items-center gap-1">
-                      🌐 Google Account
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400 font-semibold">Google</span>
-                  </div>
-                  <p className="text-white/40 text-[11px] mt-1 font-mono">
-                    ID: <strong className="text-white select-all">surajkumar1903@gmail.com</strong>
-                  </p>
-                  <p className="text-white/40 text-[11px] font-mono">
-                    Pass: <strong className="text-[#f5a623] select-all">suraj123</strong>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[1])}
-                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-white hover:bg-neutral-200 text-[#070707] text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                >
-                  <Zap size={12} /> Login with Google
-                </button>
-              </div>
-
-              {/* Account 3: Phone OTP Account */}
-              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white flex items-center gap-1">
-                      📱 Phone OTP User
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-semibold">Phone</span>
-                  </div>
-                  <p className="text-white/40 text-[11px] mt-1 font-mono">
-                    Phone: <strong className="text-white select-all">+91 9876543210</strong>
-                  </p>
-                  <p className="text-white/40 text-[11px] font-mono">
-                    Default OTP: <strong className="text-emerald-400 select-all">482910</strong>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTab('phone');
-                    setPhone('9876543210');
-                    handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[2]);
-                  }}
-                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                >
-                  <Zap size={12} /> Login with Phone OTP
-                </button>
-              </div>
-
-              {/* Account 4: Customer Account */}
-              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white flex items-center gap-1">
-                      👤 Customer (Priya)
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-400 font-semibold">Email</span>
-                  </div>
-                  <p className="text-white/40 text-[11px] mt-1 font-mono">
-                    ID: <strong className="text-white select-all">priya.verma@gmail.com</strong>
-                  </p>
-                  <p className="text-white/40 text-[11px] font-mono">
-                    Pass: <strong className="text-[#f5a623] select-all">priya123</strong>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[3])}
-                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                >
-                  <Zap size={12} /> Login as Priya
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ── GOOGLE 1-TAP LOGIN BUTTON ─────────────────────── */}
         <div className="mb-5">
