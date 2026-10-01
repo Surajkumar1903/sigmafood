@@ -250,10 +250,13 @@ interface UIState {
   isCartOpen: boolean;
   isSearchOpen: boolean;
   isMobileMenuOpen: boolean;
+  isChatbotOpen: boolean;
   activeProductId: string | null;
   setCartOpen: (v: boolean) => void;
   setSearchOpen: (v: boolean) => void;
   setMobileMenuOpen: (v: boolean) => void;
+  setChatbotOpen: (v: boolean) => void;
+  toggleChatbot: () => void;
   setActiveProductId: (id: string | null) => void;
 }
 
@@ -261,9 +264,12 @@ export const useUIStore = create<UIState>()((set) => ({
   isCartOpen: false,
   isSearchOpen: false,
   isMobileMenuOpen: false,
+  isChatbotOpen: false,
   activeProductId: null,
   setCartOpen: (v) => set({ isCartOpen: v }),
   setSearchOpen: (v) => set({ isSearchOpen: v }),
   setMobileMenuOpen: (v) => set({ isMobileMenuOpen: v }),
+  setChatbotOpen: (v) => set({ isChatbotOpen: v }),
+  toggleChatbot: () => set((s) => ({ isChatbotOpen: !s.isChatbotOpen })),
   setActiveProductId: (id) => set({ activeProductId: id }),
 }));

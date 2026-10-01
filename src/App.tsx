@@ -9,6 +9,7 @@ import PromoPopup from './components/PromoPopup';
 import MobileBottomNav from './components/MobileBottomNav';
 import ScrollToTop from './components/ScrollToTop';
 import ScrollProgress from './components/ScrollProgress';
+import Chatbot from './components/Chatbot';
 
 // Pages
 import HomePage from './pages/Home';
@@ -60,6 +61,7 @@ export default function App() {
         <QuickViewModal />
         <PromoPopup />
         <MobileBottomNav />
+        <Chatbot />
         <Toaster
           position="top-right"
           toastOptions={{
