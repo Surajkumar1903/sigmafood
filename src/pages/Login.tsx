@@ -14,9 +14,13 @@ import {
   Smartphone,
   Sparkles,
   RefreshCw,
+  KeyRound,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { useAuthStore } from '../store';
 import { db, type DbUser } from '../services/db';
+import { CLOUD_TEST_ACCOUNTS } from '../services/cloudDb';
 import toast from 'react-hot-toast';
 
 type LoginTab = 'phone' | 'email';
@@ -44,6 +48,9 @@ export default function LoginPage() {
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  // Show/Hide test credentials banner
+  const [showCredentialsCard, setShowCredentialsCard] = useState(true);
+
   // Timer countdown for OTP resend
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -63,7 +70,9 @@ export default function LoginPage() {
     email: string;
     phone: string;
     avatar?: string;
+    password?: string;
     provider: 'google' | 'phone' | 'email';
+    role?: 'admin' | 'customer';
   }) => {
     const dbUser: DbUser = {
       id: `usr_${Date.now()}`,
@@ -71,12 +80,14 @@ export default function LoginPage() {
       email: userRecord.email,
       phone: userRecord.phone,
       avatar: userRecord.avatar,
+      password: userRecord.password || '******',
+      role: userRecord.role || (userRecord.email.toLowerCase().includes('admin') ? 'admin' : 'customer'),
       authProvider: userRecord.provider,
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
     };
 
-    // Save to real database
+    // Save to real persistent database (IndexedDB + Cloud)
     await db.saveUser(dbUser);
 
     // Save to Zustand Auth store
@@ -87,8 +98,28 @@ export default function LoginPage() {
       avatar: userRecord.avatar,
     });
 
-    const isAdmin = userRecord.email.toLowerCase().includes('admin');
+    const isAdmin = userRecord.role === 'admin' || userRecord.email.toLowerCase().includes('admin');
     navigate(isAdmin ? '/admin' : '/');
+  };
+
+  // ──────────────────────────────────────────────────────────
+  // 1-CLICK INSTANT LOGIN WITH VISIBLE TEST ACCOUNTS
+  // ──────────────────────────────────────────────────────────
+  const handleAutoLoginAccount = (account: typeof CLOUD_TEST_ACCOUNTS[0]) => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      completeLogin({
+        name: account.name,
+        email: account.email,
+        phone: account.phone,
+        password: account.password,
+        avatar: account.avatar,
+        provider: account.authProvider,
+        role: account.role,
+      });
+      toast.success(`Logged in as ${account.name}! 🎉`);
+    }, 450);
   };
 
   // ──────────────────────────────────────────────────────────
@@ -96,7 +127,7 @@ export default function LoginPage() {
   // ──────────────────────────────────────────────────────────
   const handleGoogleLogin = async (selectedEmail?: string, selectedName?: string) => {
     setGoogleLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 600));
     setGoogleLoading(false);
     setShowGoogleModal(false);
 
@@ -107,6 +138,7 @@ export default function LoginPage() {
       name: nameToUse,
       email: emailToUse,
       phone: '+91 7838853490',
+      password: 'google_oauth_token',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
       provider: 'google',
     });
@@ -126,10 +158,9 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 500));
     setLoading(false);
 
-    // Generate random 6-digit OTP
     const mockOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(mockOtp);
     setOtpSent(true);
@@ -137,18 +168,22 @@ export default function LoginPage() {
     setCanResend(false);
 
     toast.success(`OTP sent to +91 ${cleanPhone.slice(-10)} 📲`, { duration: 4000 });
-    // Show realistic SMS toast
     setTimeout(() => {
-      toast((t) => (
-        <div className="flex items-start gap-2">
-          <Smartphone className="w-5 h-5 text-[#f5a623] shrink-0 mt-0.5" />
-          <div>
-            <p className="text-xs font-bold text-white">Sigma Foods SMS</p>
-            <p className="text-xs text-white/80">Your verification OTP is: <span className="font-mono text-[#f5a623] font-extrabold">{mockOtp}</span></p>
+      toast(
+        (t) => (
+          <div className="flex items-start gap-2">
+            <Smartphone className="w-5 h-5 text-[#f5a623] shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-white">Sigma Foods SMS</p>
+              <p className="text-xs text-white/80">
+                Your login OTP is: <span className="font-mono text-[#f5a623] font-extrabold text-sm">{mockOtp}</span>
+              </p>
+            </div>
           </div>
-        </div>
-      ), { duration: 8000, position: 'top-center' });
-    }, 700);
+        ),
+        { duration: 9000, position: 'top-center' }
+      );
+    }, 600);
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -159,9 +194,8 @@ export default function LoginPage() {
       return;
     }
 
-    // Verify OTP (accepts generated code or any 6 digits for testing)
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 700));
+    await new Promise((r) => setTimeout(r, 600));
     setLoading(false);
 
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
@@ -181,10 +215,8 @@ export default function LoginPage() {
     nextDigits[index] = val.slice(-1);
     setOtpDigits(nextDigits);
 
-    // Auto-focus next input box
     if (val && index < 5) {
-      const nextInput = document.getElementById(`otp-box-${index + 1}`);
-      nextInput?.focus();
+      document.getElementById(`otp-box-${index + 1}`)?.focus();
     }
   };
 
@@ -205,35 +237,19 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 500));
     setLoading(false);
 
     const isAdmin = email.toLowerCase().includes('admin');
     await completeLogin({
       name: isAdmin ? 'Sigma Admin' : email.split('@')[0],
-      email: email,
+      email,
       phone: '+91 7838853490',
+      password,
       provider: 'email',
     });
 
     toast.success(isAdmin ? 'Welcome to Admin Portal! 👑' : 'Welcome back! 🎉');
-  };
-
-  const handleQuickAdmin = () => {
-    setEmail('admin@sigmafoods.com');
-    setPassword('admin123');
-    setTab('email');
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      completeLogin({
-        name: 'Sigma Admin',
-        email: 'admin@sigmafoods.com',
-        phone: '+91 7838853490',
-        provider: 'email',
-      });
-      toast.success('Welcome to Admin Portal! 👑');
-    }, 400);
   };
 
   return (
@@ -243,7 +259,7 @@ export default function LoginPage() {
         background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.08) 0%, #070707 70%)',
       }}
     >
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-xl">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#f5a623] to-[#ff6b35] flex items-center justify-center mb-3 shadow-[0_0_35px_rgba(245,166,35,0.4)]">
@@ -253,6 +269,133 @@ export default function LoginPage() {
           <p className="text-white/50 text-sm mt-1">Order your favorite pure veg delicacies</p>
         </div>
 
+        {/* ── VISIBLE TEST ACCOUNTS & PASSWORDS (DIRECT REVEAL) ──── */}
+        {showCredentialsCard && (
+          <div className="mb-6 p-4 rounded-3xl bg-[rgba(245,166,35,0.08)] border border-[rgba(245,166,35,0.3)] shadow-xl animate-fade-up">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <KeyRound size={16} className="text-[#f5a623]" />
+                <span className="text-white font-bold text-xs uppercase tracking-wider">
+                  Live Test Accounts (IDs & Passwords)
+                </span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f5a623] text-[#070707] font-extrabold">
+                1-Click Login
+              </span>
+            </div>
+
+            <p className="text-white/60 text-xs mb-3">
+              Aap inme se kisi bhi account par tap karke instant login kar sakte hain:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {/* Account 1: Admin */}
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white flex items-center gap-1">
+                      👑 Admin Account
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-semibold">Admin</span>
+                  </div>
+                  <p className="text-white/40 text-[11px] mt-1 font-mono">
+                    ID: <strong className="text-white select-all">admin@sigmafoods.com</strong>
+                  </p>
+                  <p className="text-white/40 text-[11px] font-mono">
+                    Pass: <strong className="text-[#f5a623] select-all">admin123</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[0])}
+                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-[#f5a623] hover:bg-[#e09618] text-[#070707] text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <Zap size={12} /> Login as Admin
+                </button>
+              </div>
+
+              {/* Account 2: Google Verified */}
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white flex items-center gap-1">
+                      🌐 Google Account
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400 font-semibold">Google</span>
+                  </div>
+                  <p className="text-white/40 text-[11px] mt-1 font-mono">
+                    ID: <strong className="text-white select-all">surajkumar1903@gmail.com</strong>
+                  </p>
+                  <p className="text-white/40 text-[11px] font-mono">
+                    Pass: <strong className="text-[#f5a623] select-all">suraj123</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[1])}
+                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-white hover:bg-neutral-200 text-[#070707] text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <Zap size={12} /> Login with Google
+                </button>
+              </div>
+
+              {/* Account 3: Phone OTP Account */}
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white flex items-center gap-1">
+                      📱 Phone OTP User
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-semibold">Phone</span>
+                  </div>
+                  <p className="text-white/40 text-[11px] mt-1 font-mono">
+                    Phone: <strong className="text-white select-all">+91 9876543210</strong>
+                  </p>
+                  <p className="text-white/40 text-[11px] font-mono">
+                    Default OTP: <strong className="text-emerald-400 select-all">482910</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab('phone');
+                    setPhone('9876543210');
+                    handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[2]);
+                  }}
+                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <Zap size={12} /> Login with Phone OTP
+                </button>
+              </div>
+
+              {/* Account 4: Customer Account */}
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/8 hover:border-[rgba(245,166,35,0.4)] transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white flex items-center gap-1">
+                      👤 Customer (Priya)
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-400 font-semibold">Email</span>
+                  </div>
+                  <p className="text-white/40 text-[11px] mt-1 font-mono">
+                    ID: <strong className="text-white select-all">priya.verma@gmail.com</strong>
+                  </p>
+                  <p className="text-white/40 text-[11px] font-mono">
+                    Pass: <strong className="text-[#f5a623] select-all">priya123</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAutoLoginAccount(CLOUD_TEST_ACCOUNTS[3])}
+                  className="mt-2.5 py-1.5 px-3 rounded-xl bg-gradient-to-r from-[#f5a623] to-[#ff6b35] text-[#070707] text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <Zap size={12} /> Login as Priya
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── GOOGLE 1-TAP LOGIN BUTTON ─────────────────────── */}
         <div className="mb-5">
           <button
@@ -260,7 +403,6 @@ export default function LoginPage() {
             onClick={() => setShowGoogleModal(true)}
             className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-neutral-100 text-neutral-800 font-bold text-sm flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
           >
-            {/* Real Google SVG Logo */}
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
@@ -286,7 +428,7 @@ export default function LoginPage() {
         {/* Divider */}
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1 h-px bg-white/10" />
-          <span className="text-white/40 text-xs uppercase tracking-wider font-semibold">Or Sign In with</span>
+          <span className="text-white/40 text-xs uppercase tracking-wider font-semibold">Or Type ID & Password</span>
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
@@ -367,7 +509,7 @@ export default function LoginPage() {
                       onClick={() => setOtpSent(false)}
                       className="text-xs text-[#f5a623] hover:underline"
                     >
-                      Change
+                      Change Number
                     </button>
                   </div>
 
@@ -396,7 +538,7 @@ export default function LoginPage() {
                   {generatedOtp && (
                     <div className="p-2.5 rounded-xl bg-[rgba(245,166,35,0.08)] border border-[rgba(245,166,35,0.2)] flex items-center justify-between text-xs">
                       <span className="text-white/70">
-                        Demo OTP: <strong className="text-[#f5a623] font-mono">{generatedOtp}</strong>
+                        Received OTP: <strong className="text-[#f5a623] font-mono text-sm">{generatedOtp}</strong>
                       </span>
                       <button
                         type="button"
@@ -444,37 +586,39 @@ export default function LoginPage() {
           {tab === 'email' && (
             <form onSubmit={handleEmailSubmit} className="space-y-4 animate-fade-up">
               <div>
-                <label className="block text-white/50 text-xs mb-1.5 font-medium">Email Address</label>
+                <label className="block text-white/50 text-xs mb-1.5 font-medium">Email Address (ID)</label>
                 <div className="relative">
                   <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="user@example.com"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-[#f5a623] text-sm transition-colors"
+                    placeholder="admin@sigmafoods.com"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-[#f5a623] text-sm transition-colors font-medium"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-white/50 text-xs mb-1.5 font-medium">Password</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-white/50 text-xs font-medium">Password</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPw(!showPw)}
+                    className="text-[11px] text-[#f5a623] hover:underline flex items-center gap-1"
+                  >
+                    {showPw ? <><EyeOff size={11} /> Hide Password</> : <><Eye size={11} /> Show Password</>}
+                  </button>
+                </div>
                 <div className="relative">
                   <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
                   <input
                     type={showPw ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-[#f5a623] text-sm transition-colors"
+                    placeholder="admin123"
+                    className="w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-[#f5a623] text-sm transition-colors font-medium"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white"
-                  >
-                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
                 </div>
               </div>
 
@@ -492,20 +636,6 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Quick Admin Test Login */}
-          <div className="mt-5 pt-4 border-t border-white/8 flex items-center justify-between">
-            <span className="text-white/40 text-xs flex items-center gap-1">
-              <Shield size={13} className="text-[#f5a623]" /> Admin Access:
-            </span>
-            <button
-              type="button"
-              onClick={handleQuickAdmin}
-              className="text-[#f5a623] hover:underline text-xs font-semibold flex items-center gap-1 cursor-pointer"
-            >
-              <Zap size={11} /> 1-Click Admin Login
-            </button>
-          </div>
-
           <p className="text-center text-white/40 text-xs sm:text-sm mt-6">
             New to Sigma Foods?{' '}
             <Link to="/register" className="text-[#f5a623] hover:underline font-semibold">
@@ -515,7 +645,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── GOOGLE ACCOUNT CHOOSER MODAL (REALISTIC SIMULATION) ── */}
+      {/* ── GOOGLE ACCOUNT CHOOSER MODAL ────────────────────── */}
       {showGoogleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-up">
           <div className="relative w-full max-w-sm rounded-3xl bg-[#181818] border border-white/10 shadow-2xl p-6 overflow-hidden">
@@ -543,7 +673,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleGoogleLogin('surajkumar1903@gmail.com', 'Suraj Kumar')}
-                className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/8 transition-all flex items-center gap-3 text-left"
+                className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/8 transition-all flex items-center gap-3 text-left cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
                   S
@@ -557,7 +687,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleGoogleLogin('foodssigma@gmail.com', 'Sigma Foods')}
-                className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/8 transition-all flex items-center gap-3 text-left"
+                className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/8 transition-all flex items-center gap-3 text-left cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#f5a623] to-[#ff6b35] flex items-center justify-center text-white font-bold text-sm shrink-0">
                   Σ
