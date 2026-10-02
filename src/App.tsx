@@ -27,6 +27,7 @@ import ContactPage from './pages/Contact';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import AdminPage from './pages/Admin';
+import MobileSimulatorPage from './pages/MobileSimulator';
 
 export default function App() {
   return (
@@ -53,6 +54,8 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/mobile" element={<MobileSimulatorPage />} />
+            <Route path="/simulator" element={<MobileSimulatorPage />} />
           </Routes>
         </main>
         <Footer />

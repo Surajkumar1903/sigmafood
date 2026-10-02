@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Search, ShoppingCart, Menu, X, ChefHat, Heart, MapPin, User, ArrowRight
+  Search, ShoppingCart, Menu, X, ChefHat, Heart, MapPin, User, ArrowRight, Smartphone
 } from 'lucide-react';
 import { useCartStore, useWishlistStore, useUIStore, useAuthStore } from '../store';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -176,6 +176,16 @@ export default function Navbar() {
                 {cartCount}
               </span>
             </button>
+
+            {/* Virtual Mobile Simulator Button */}
+            <Link
+              to="/mobile"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-[#f5a623] text-xs font-semibold transition-all shadow cursor-pointer ml-1"
+              title="Open Virtual Mobile Simulator"
+            >
+              <Smartphone size={14} className="text-[#f5a623]" />
+              <span>Mobile View</span>
+            </Link>
 
             {/* Order Now Pill Button */}
             <Link
